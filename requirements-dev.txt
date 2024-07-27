@@ -1,0 +1,15 @@
+# Normal requirements
+beartype
+
+# Testing
+pytest
+
+# Formatting
+ruff
+isort
+
+# Builds
+setuptools
+wheel
+twine
+build
