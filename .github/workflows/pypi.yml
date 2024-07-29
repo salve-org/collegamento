@@ -1,4 +1,4 @@
-name: Upload PROJECT_NAME to Pypi
+name: Upload collegamento to Pypi
 
 on:
   release:

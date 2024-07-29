@@ -11,7 +11,7 @@ sys.path.insert(0, os.path.abspath("../examples"))
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = "PROJECT_NAME"
+project = "collegamento"
 copyright = "2024, Moosems"
 author = "Moosems"
 release = "v0.1.0"

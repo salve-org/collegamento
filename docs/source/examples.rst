@@ -1,8 +1,8 @@
 =========================
-``PROJECT_NAME`` Examples
+``Collegamento`` Examples
 =========================
 
-Below are links to all the examples on using ``PROJECT_NAME``.
+Below are links to all the examples on using ``Collegamento``.
 
 .. toctree::
    :maxdepth: 1

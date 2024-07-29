@@ -1,8 +1,8 @@
 ==============================
-``PROJECT_NAME`` Documentation
+``Collegamento`` Documentation
 ==============================
 
-Welcome to ``PROJECT_NAME``'s Documentation! ``PROJECT_NAME`` is a library that can be to do xyz. To get started with ``PROJECT_NAME``, visit the :doc:`installation` page!
+Welcome to ``Collegamento``'s Documentation! ``Collegamento`` is a library that can be to do xyz. To get started with ``Collegamento``, visit the :doc:`installation` page!
 
 .. note::
 
