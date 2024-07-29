@@ -34,4 +34,6 @@ def test_Client_Server():
     assert output is not None  # noqa: E711
     assert output["result"] == False  # noqa: E712 # type: ignore
 
+    assert context.all_ids == []
+
     context.kill_IPC()

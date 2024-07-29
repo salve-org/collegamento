@@ -34,6 +34,8 @@ def test_file_variants():
     assert output is not None  # noqa: E711
     assert output["result"] == ["test", "contents"]  # noqa: E712 # type: ignore
 
+    assert context.all_ids == []
+
     context.kill_IPC()
 
 

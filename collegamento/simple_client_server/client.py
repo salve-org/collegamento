@@ -96,7 +96,6 @@ class SimpleClient:
         }
         final_notification.update(notification_dict)
         self.logger.debug(f"Notification created: {final_notification}")
-
         self.requests_queue.put(final_notification)
         self.logger.info("Message sent")
 
