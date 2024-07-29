@@ -4,6 +4,7 @@ from random import randint
 
 from .misc import (
     USER_FUNCTION,
+    CollegamentoError,
     Notification,
     Request,
     RequestQueueType,
@@ -15,11 +16,11 @@ from .server import SimpleServer
 
 class SimpleClient:
     """The IPC class is used to talk to the server and run commands. The public API includes the following methods:
-    - Client.notify_server()
-    - Client.request()
-    - Client.add_command()
-    - Client.cancel_request()
-    - Client.kill_IPC()
+    - SimpleClient.notify_server()
+    - SimpleClient.request()
+    - SimpleClient.add_command()
+    - SimpleClient.cancel_request()
+    - SimpleClient.kill_IPC()
     """
 
     def __init__(
@@ -85,7 +86,7 @@ class SimpleClient:
 
     def notify_server(
         self,
-        notification_dict: Notification,
+        notification_dict: dict,
     ) -> None:
         self.logger.info("Creating notification for server")
 
@@ -112,7 +113,7 @@ class SimpleClient:
             self.logger.exception(
                 f"Command {command} not in builtin commands. Those are {self.commands}!"
             )
-            raise Exception(
+            raise CollegamentoError(
                 f"Command {command} not in builtin commands. Those are {self.commands}!"
             )
 
@@ -138,7 +139,7 @@ class SimpleClient:
             self.logger.exception(
                 f"Cannot cancel command {command}, valid commands are {self.commands}"
             )
-            raise Exception(
+            raise CollegamentoError(
                 f"Cannot cancel command {command}, valid commands are {self.commands}"
             )
 
@@ -181,7 +182,7 @@ class SimpleClient:
             self.logger.exception(
                 f"Cannot get response of command {command}, valid commands are {self.commands}"
             )
-            raise Exception(
+            raise CollegamentoError(
                 f"Cannot get response of command {command}, valid commands are {self.commands}"
             )
 
@@ -191,12 +192,12 @@ class SimpleClient:
         self.logger.info("Response retrieved")
         return response
 
-    def add_commmand(self, name: str, command: USER_FUNCTION) -> None:
+    def add_command(self, name: str, command: USER_FUNCTION) -> None:
         if name == "add-command":
             self.logger.exception(
                 "Cannot add command add-command as it is a special builtin"
             )
-            raise Exception(
+            raise CollegamentoError(
                 "Cannot add command add-command as it is a special builtin"
             )
 

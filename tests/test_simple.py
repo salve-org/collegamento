@@ -17,7 +17,7 @@ def test_Client_Server():
 
     sleep(1)
 
-    context.add_commmand("test1", foo)
+    context.add_command("test1", foo)
 
     sleep(1)
 

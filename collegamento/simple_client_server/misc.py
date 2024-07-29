@@ -41,3 +41,6 @@ if TYPE_CHECKING:
 else:
     ResponseQueueType = GenericQueueClass
     RequestQueueType = GenericQueueClass
+
+
+class CollegamentoError(Exception): ...  # I don't like the boilerplate either

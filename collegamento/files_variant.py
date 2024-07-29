@@ -4,6 +4,7 @@ from typing import NotRequired
 
 from .simple_client_server import (
     USER_FUNCTION,
+    CollegamentoError,
     Notification,
     Request,
     SimpleClient,
@@ -69,7 +70,7 @@ class FileClient(SimpleClient):
             self.logger.exception(
                 f"Cannot remove file {file} as file is not in file database!"
             )
-            raise Exception(
+            raise CollegamentoError(
                 f"Cannot remove file {file} as file is not in file database!"
             )
 

@@ -25,7 +25,7 @@ def test_file_variants():
     assert output is not None  # noqa: E711
     assert output["result"] is True  # noqa: E712 # type: ignore
 
-    context.add_commmand("test1", split_str)
+    context.add_command("test1", split_str)
     context.request({"command": "test1", "file": "test"})
 
     sleep(1)
