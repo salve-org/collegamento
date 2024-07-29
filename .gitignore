@@ -7,7 +7,7 @@ dist/
 build/
 .ruff_cache/
 .pytest_cache/
-PROJECT_NAME.egg-info/
+collegamento.egg-info/
 
 # Pycharm
 .idea

@@ -1,4 +1,4 @@
-# pip install -U -r requirements-dev.txt --break-system-packages; pip uninstall albero -y --break-system-packages; pip install . --break-system-packages --no-build-isolation; python3 -m pytest .
+# pip install -U -r requirements-dev.txt --break-system-packages; pip uninstall collegamento -y --break-system-packages; pip install . --break-system-packages --no-build-isolation; python3 -m pytest .
 from setuptools import setup
 
 with open("README.md", "r") as file:
@@ -6,12 +6,12 @@ with open("README.md", "r") as file:
 
 
 setup(
-    name="PROJECT_NAME",
+    name="collegamento",
     version="0.1.0",
-    description="PROJECT_NAME does xyz",
+    description="Collegamento provides an easy to use Client/Server IPC backend",
     author="Moosems",
     author_email="moosems.j@gmail.com",
-    url="https://github.com/salve-org/PROJECT_NAME",
+    url="https://github.com/salve-org/collegamento",
     long_description=long_description,
     long_description_content_type="text/markdown",
     install_requires=open("requirements.txt", "r+")
@@ -27,5 +27,5 @@ setup(
         "License :: OSI Approved :: MIT License",
         "Typing :: Typed",
     ],
-    packages=["PROJECT_NAME"],  # , "PROJECT_NAME.subpackages"],
+    packages=["collegamento", "collegamento.simple_client_server"],
 )

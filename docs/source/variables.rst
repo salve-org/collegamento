@@ -2,9 +2,9 @@
 Variables
 =========
 
-.. _Example Variable Overview:
+.. _USER_FUNCTION Overview:
 
-``Example variable``
-********************
+``USER_FUNCTION``
+*****************
 
-Example variable does xyz
+``USER_FUNCTION`` is a type variable that simply states that any function that matches this type takes in a :ref:`Request Overview` class and returns anything or even nothing.

@@ -1,14 +1,14 @@
-<h1 align="center">PROJECT_NAME v0.1.0</h1>
+<h1 align="center">collegamento v0.1.0</h1>
 
-A tool that makes it much easier to do xyz.
+A tool that makes it much easier to make offload work when asyncio isn't an option.
 
 # Installation
 
-In the Command Line, paste the following: `pip install PROJECT_NAME`
+In the Command Line, paste the following: `pip install collegamento`
 
 ## Description
 
-PROJECT_NAME is a library that can be used for xyz. Docs are listed on this [ReadTheDocs page](https://PROJECT_NAME.readthedocs.io/en/master/)
+Collegamento is a library that can be used for Client/Server IPC's with the goal of offloading major workloads to a second process. Docs are listed on this [ReadTheDocs page](https://collegamento.readthedocs.io/en/master/)
 
 ## Contributing
 
@@ -22,5 +22,3 @@ Currently 3.11 is the minimum (instead of 3.10) as this was developed under 3.12
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](./LICENSE).
-
-Keywords to `git grep` for when using template are `xyz` and `PROJECT_NAME`
