@@ -33,8 +33,6 @@ The ``SimpleClient`` class can do:
 - ``SimpleClient.notify_server(notification_dict: dict)`` (as a base class, this has no use case, but it will likely be used by any given subclass)
 - ``SimpleClient.request(request_details: dict)`` (all details in request_details are specific to the command in the request_details)
 - ``SimpleClient.add_command(name: str, command: USER_FUNCTION)`` (adds the function with the name provided that takes input of ``Request`` and returns anything``
-- ``SimpleClient.cancel_request(command: str)`` (will not give output for any requests of type command. When is this ever used? No idea! Why? Because it doesn't actually stop the server from completing it)
-TODO: remove this stupid feature. No point in it.
 - ``SimpleClient.kill_IPC()`` (kills the IPC server)
 
 .. _FileClient Overview:

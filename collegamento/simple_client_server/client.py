@@ -19,7 +19,6 @@ class SimpleClient:
     - SimpleClient.notify_server()
     - SimpleClient.request()
     - SimpleClient.add_command()
-    - SimpleClient.cancel_request()
     - SimpleClient.kill_IPC()
     """
 
@@ -107,9 +106,10 @@ class SimpleClient:
         """Sends the main_server a request of type command with given kwargs - external API"""
         self.logger.debug("Beginning request")
 
-        # TODO: Should this just be a walrus operator? "(command := request_dict["command"])"
-        command: str = request_details["command"]
-        if command not in self.commands:
+        # NOTE: this variable could've been a standalone line but I thought it would just be better
+        # to use the walrus operator. No point in a language feature if its never used. Plus,
+        # it also looks quite nice :D
+        if (command := request_details["command"]) not in self.commands:
             self.logger.exception(
                 f"Command {command} not in builtin commands. Those are {self.commands}!"
             )
@@ -132,19 +132,6 @@ class SimpleClient:
 
         self.requests_queue.put(final_request)
         self.logger.info("Message sent")
-
-    def cancel_request(self, command: str) -> None:
-        """Cancels a request of type command - external API"""
-        if command not in self.commands:
-            self.logger.exception(
-                f"Cannot cancel command {command}, valid commands are {self.commands}"
-            )
-            raise CollegamentoError(
-                f"Cannot cancel command {command}, valid commands are {self.commands}"
-            )
-
-        self.logger.info(f"Cancelled command: {command}")
-        self.current_ids[command] = 0
 
     def parse_response(self, res: Response) -> None:
         """Parses main_server output line and discards useless responses - internal API"""
