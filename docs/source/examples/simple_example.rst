@@ -24,7 +24,7 @@ Simple Example
         sleep(1)
     
         output: Response | None = context.get_response("test")
-        if output is not None and output["result"] == True:  # type: ignore
+        if output is not None and output["result"]:  # type: ignore
             print("Yippee! It worked!")
         else:
             print("Aww, maybe your compute is just a little slow?")

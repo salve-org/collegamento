@@ -22,5 +22,3 @@ Currently 3.11 is the minimum (instead of 3.10) as this was developed under 3.12
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](./LICENSE).
-
-Keywords to `git grep` for when using template are `xyz` and `PROJECT_NAME`

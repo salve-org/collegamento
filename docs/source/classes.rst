@@ -21,7 +21,7 @@ The ``Request`` class is a TypedDict meant to provide a framework for items give
 ``Response``
 ************
 
-The ``Response`` class is what is returned by the ``SimpleClient`` or one of it's variants to the user. The useful data is found at ``some_response["result"]``.
+The ``Response`` class is what is returned by the "ref:`SimpleClient Overview` or one of it's variants to the user. The useful data is found at ``some_response["result"]``.
 
 .. _SimpleClient Overview:
 
@@ -32,7 +32,7 @@ The ``SimpleClient`` class can do:
 
 - ``SimpleClient.notify_server(notification_dict: dict)`` (as a base class, this has no use case, but it will likely be used by any given subclass)
 - ``SimpleClient.request(request_details: dict)`` (all details in request_details are specific to the command in the request_details)
-- ``SimpleClient.add_command(name: str, command: USER_FUNCTION)`` (adds the function with the name provided that takes input of ``Request`` and returns anything``
+- ``SimpleClient.add_command(name: str, command: USER_FUNCTION)`` (adds the function with the name provided that takes input of :ref:`Request Overview` and returns anything``
 - ``SimpleClient.kill_IPC()`` (kills the IPC server)
 
 .. _FileClient Overview:
@@ -40,6 +40,9 @@ The ``SimpleClient`` class can do:
 ``FileClient``
 **************
 
-``FileClient`` can do:
+``FileClient`` has the additional methods:
 
-- ``xyz``
+- ``FileClient.update_file(file: str, current_state: str)`` (adds or updates the file with the new contents and notifies server of changes)
+- ``FileClient.remove_file(file: str)`` (removes the file specified from the system and notifies the server to fo the same)
+
+This class also has some changed functionality. When you make a ``.request()`` and add a file to the request, it chnages the request's name to its contents for the function to use.

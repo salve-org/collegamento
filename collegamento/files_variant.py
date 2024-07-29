@@ -55,7 +55,7 @@ class FileClient(SimpleClient):
         self.files[file] = current_state
 
         self.logger.debug("Creating notification dict")
-        notification: FileNotification = {  # type: ignore
+        notification: dict = {
             "file": file,
             "remove": False,
             "contents": self.files[file],
@@ -75,10 +75,7 @@ class FileClient(SimpleClient):
             )
 
         self.logger.info("Notifying server of file deletion")
-        # self.create_message("notification", remove=True, file=file)
-        notification: FileNotification = {
-            "id": super().create_message_id(),
-            "type": "notification",
+        notification: dict = {
             "file": file,
             "remove": True,
         }
