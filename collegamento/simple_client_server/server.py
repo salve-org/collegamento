@@ -13,7 +13,7 @@ from .misc import (
 )
 
 
-class Server:
+class SimpleServer:
     """Handles input from the user and returns output from special functions. Not an external API."""
 
     def __init__(

@@ -1,4 +1,4 @@
-from .client import Client  # noqa: F401, E402
+from .client import SimpleClient  # noqa: F401, E402
 from .misc import (  # noqa: F401, E402
     USER_FUNCTION,
     Notification,
@@ -7,4 +7,4 @@ from .misc import (  # noqa: F401, E402
     Response,
     ResponseQueueType,
 )
-from .server import Server  # noqa: F401, E402
+from .server import SimpleServer  # noqa: F401, E402

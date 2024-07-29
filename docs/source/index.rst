@@ -15,6 +15,4 @@ Welcome to ``Collegamento``'s Documentation! ``Collegamento`` is a library that 
    installation
    example-usage
    classes
-   variables
-   functions
    examples

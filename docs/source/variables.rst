@@ -2,9 +2,9 @@
 Variables
 =========
 
-.. _Example Variable Overview:
+.. _USER_FUNCTION Overview:
 
-``Example variable``
-********************
+``USER_FUNCTION``
+*****************
 
-Example variable does xyz
+USER_FUNCTION does xyz

@@ -2,7 +2,13 @@ from logging import Logger
 from multiprocessing.queues import Queue as GenericQueueClass
 from typing import NotRequired
 
-from .ipc import USER_FUNCTION, Client, Notification, Request, Server
+from .simple_client_server import (
+    USER_FUNCTION,
+    SimpleClient,
+    Notification,
+    Request,
+    SimpleServer,
+)
 
 
 class FileRequest(Request):
@@ -16,7 +22,11 @@ class FileNotification(Notification):
     contents: NotRequired[str]
 
 
-class FileClient(Client):
+class FileClient(SimpleClient):
+    """File handling variant of SImpleClient. Extra methods:
+     - FileClient.update_file()
+     - FileClient.remove_file()
+    """
     def __init__(
         self, commands: dict[str, USER_FUNCTION], id_max: int = 15_000
     ) -> None:
@@ -76,7 +86,8 @@ class FileClient(Client):
         super().notify_server(notification)
 
 
-class FileServer(Server):
+class FileServer(SimpleServer):
+    """File handling variant of SimpleServer"""
     def __init__(
         self,
         commands: dict[str, USER_FUNCTION],

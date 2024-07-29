@@ -10,10 +10,10 @@ from .misc import (
     Response,
     ResponseQueueType,
 )
-from .server import Server
+from .server import SimpleServer
 
 
-class Client:
+class SimpleClient:
     """The IPC class is used to talk to the server and run commands. The public API includes the following methods:
     - Client.notify_server()
     - Client.request()
@@ -26,13 +26,13 @@ class Client:
         self,
         commands: dict[str, USER_FUNCTION],
         id_max: int = 15_000,
-        server_type: type = Server,
+        server_type: type = SimpleServer,
     ) -> None:
         self.all_ids: list[int] = []
         self.id_max = id_max
         self.current_ids: dict[str, int] = {}
         self.newest_responses: dict[str, Response | None] = {}
-        self.server_type: type[Server] = server_type
+        self.server_type: type[SimpleServer] = server_type
 
         self.commands = commands
         for command in self.commands:

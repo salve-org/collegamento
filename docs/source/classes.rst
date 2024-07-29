@@ -2,11 +2,42 @@
 Classes
 =======
 
-.. _Example Class Overview:
+.. _Notification Overview:
 
-``Example_Class``
-*****************
+``Notification``
+****************
 
-``Exampmle_class`` can do:
+The ``Notification`` class is for xyz.
 
- - xyz
+.. _Request Overview:
+
+``Request``
+***********
+
+The ``Request`` class is for xyz.
+
+.. _Response Overview:
+
+``Response``
+************
+
+The ``Response`` class is for xyz.
+
+.. _SimpleClient Overview:
+
+``SimpleClient``
+****************
+
+The ``SimpleClient`` class can do:
+
+- ``SimpleClient.xyz``
+- ``SimpleClient.yippee``
+
+.. _FileClient Overview:
+
+``FileClient``
+**************
+
+``FileClient`` can do:
+
+- ``xyz``
