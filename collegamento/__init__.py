@@ -8,7 +8,6 @@ from .files_variant import (  # noqa: F401, E402
     FileRequest,
     FileServer,
 )
-
 from .simple_client_server import (  # noqa: F401, E402
     USER_FUNCTION,
     Notification,

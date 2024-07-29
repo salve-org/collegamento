@@ -4,9 +4,9 @@ from typing import NotRequired
 
 from .simple_client_server import (
     USER_FUNCTION,
-    SimpleClient,
     Notification,
     Request,
+    SimpleClient,
     SimpleServer,
 )
 
@@ -24,9 +24,10 @@ class FileNotification(Notification):
 
 class FileClient(SimpleClient):
     """File handling variant of SImpleClient. Extra methods:
-     - FileClient.update_file()
-     - FileClient.remove_file()
+    - FileClient.update_file()
+    - FileClient.remove_file()
     """
+
     def __init__(
         self, commands: dict[str, USER_FUNCTION], id_max: int = 15_000
     ) -> None:
@@ -88,6 +89,7 @@ class FileClient(SimpleClient):
 
 class FileServer(SimpleServer):
     """File handling variant of SimpleServer"""
+
     def __init__(
         self,
         commands: dict[str, USER_FUNCTION],
