@@ -55,8 +55,12 @@ class FileClient(SimpleClient):
         if "file" in request_details:
             file = request_details["file"]
             if file not in self.files:
-                self.logger.exception(f"File {file} not in files! Files are {self.files.keys()}")
-                raise Exception(f"File {file} not in files! Files are {self.files.keys()}")
+                self.logger.exception(
+                    f"File {file} not in files! Files are {self.files.keys()}"
+                )
+                raise Exception(
+                    f"File {file} not in files! Files are {self.files.keys()}"
+                )
 
         super().request(request_details)
 
