@@ -48,6 +48,18 @@ class FileClient(SimpleClient):
             self.update_file(file, data)
         self.logger.debug("Finished copying files to server")
 
+    def request(
+        self,
+        request_details: dict,
+    ) -> None:
+        if "file" in request_details:
+            file = request_details["file"]
+            if file not in self.files:
+                self.logger.exception(f"File {file} not in files! Files are {self.files.keys()}")
+                raise Exception(f"File {file} not in files! Files are {self.files.keys()}")
+
+        super().request(request_details)
+
     def update_file(self, file: str, current_state: str) -> None:
         """Updates files in the system - external API"""
 
