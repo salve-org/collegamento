@@ -125,7 +125,6 @@ class FileServer(SimpleServer):
     def handle_request(self, request: Request) -> None:
         if "file" in request:
             file = request["file"]
-            if file:
-                request["file"] = self.files[file]
+            request["file"] = self.files[file]
 
         super().handle_request(request)
