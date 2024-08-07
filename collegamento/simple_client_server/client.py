@@ -5,7 +5,6 @@ from random import randint
 from .misc import (
     USER_FUNCTION,
     CollegamentoError,
-    Notification,
     Request,
     RequestQueueType,
     Response,
@@ -16,7 +15,6 @@ from .server import SimpleServer
 
 class SimpleClient:
     """The IPC class is used to talk to the server and run commands. The public API includes the following methods:
-    - SimpleClient.notify_server()
     - SimpleClient.request()
     - SimpleClient.add_command()
     - SimpleClient.kill_IPC()
@@ -82,22 +80,6 @@ class SimpleClient:
             self.create_server()
 
         return id
-
-    def notify_server(
-        self,
-        notification_dict: dict,
-    ) -> None:
-        self.logger.info("Creating notification for server")
-
-        id: int = self.create_message_id()
-        final_notification: Notification = {
-            "id": id,
-            "type": "notification",
-        }
-        final_notification.update(notification_dict)
-        self.logger.debug(f"Notification created: {final_notification}")
-        self.requests_queue.put(final_notification)
-        self.logger.info("Message sent")
 
     def request(
         self,

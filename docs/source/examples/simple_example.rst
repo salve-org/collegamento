@@ -4,12 +4,16 @@ Simple Example
 
 .. code-block:: python
 
-    from time import sleep
+    from collegamento import (
+        USER_FUNCTION,
+        Request,
+        Response,
+        SimpleClient,
+        SimpleServer,
+    )
     
-    from collegamento import USER_FUNCTION, Request, Response, SimpleClient
     
-    
-    def foo(bar: Request) -> bool:
+    def foo(server: "SimpleServer", bar: Request) -> bool:
         if bar["command"] == "test":
             return True
         return False
@@ -20,8 +24,6 @@ Simple Example
         context = SimpleClient(commands)
     
         context.request({"command": "test"})
-    
-        sleep(1)
     
         output: Response | None = context.get_response("test")
         if output is not None and output["result"]:  # type: ignore

@@ -6,10 +6,16 @@ File Example
 
     from time import sleep
     
-    from collegamento import USER_FUNCTION, FileClient, Request, Response
+    from collegamento import (
+        USER_FUNCTION,
+        FileClient,
+        FileServer,
+        Request,
+        Response,
+    )
     
     
-    def split_str(arg: Request) -> list[str]:
+    def split_str(server: "FileServer", arg: Request) -> list[str]:
         file = arg["file"]  # type: ignore
         return file.split(" ")
     
@@ -19,6 +25,7 @@ File Example
         context = FileClient(commands)
     
         context.update_file("test", "test contents")
+        sleep(1)
         context.request({"command": "test", "file": "test"})
     
         sleep(1)

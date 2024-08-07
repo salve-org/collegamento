@@ -1,6 +1,6 @@
 from time import sleep
 
-from collegamento import FileClient, Request
+from collegamento import FileClient, FileServer, Request
 
 
 class MyClient:
@@ -21,7 +21,7 @@ class MyClient:
             return output["result"]  # type: ignore
         return output
 
-    def split_str(self, arg: Request) -> list[str]:
+    def split_str(self, server: FileServer, arg: Request) -> list[str]:
         file = arg["file"]  # type: ignore
         return file.split(" ")
 

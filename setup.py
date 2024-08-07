@@ -7,7 +7,7 @@ with open("README.md", "r") as file:
 
 setup(
     name="collegamento",
-    version="0.1.1",
+    version="0.2.0",
     description="Collegamento provides an easy to use Client/Server IPC backend",
     author="Moosems",
     author_email="moosems.j@gmail.com",

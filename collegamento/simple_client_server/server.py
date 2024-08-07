@@ -5,7 +5,6 @@ from typing import Any
 
 from .misc import (
     USER_FUNCTION,
-    Notification,
     Request,
     RequestQueueType,
     Response,
@@ -22,6 +21,7 @@ class SimpleServer:
         response_queue: GenericQueueClass,
         requests_queue: GenericQueueClass,
         logger: Logger,
+        priority_commands: list[str] = [],
     ) -> None:
         self.logger: Logger = logger
         self.logger.info("Starting server setup")
@@ -31,6 +31,7 @@ class SimpleServer:
         self.all_ids: list[int] = []
         self.newest_ids: dict[str, int] = {}
         self.newest_requests: dict[str, Request | None] = {}
+        self.priority_commands: list[str] = priority_commands
 
         self.commands: dict[str, USER_FUNCTION] = commands
         for command in self.commands:
@@ -54,24 +55,16 @@ class SimpleServer:
         self.response_queue.put(response)
         self.logger.info(f"Simple response for id {id} sent")
 
-    def parse_line(self, message: Request | Notification) -> None:
+    def parse_line(self, message: Request) -> None:
         self.logger.debug("Parsing Message from user")
         id: int = message["id"]
 
-        if message["type"] not in {"notification", "request"}:
+        if message["type"] != "request":
             self.logger.warning(
                 f"Unknown type {type}. Sending simple response"
             )
             self.simple_id_response(id)
             self.logger.debug(f"Simple response for id {id} sent")
-            return
-
-        if message["type"] == "notification":
-            self.logger.debug("Mesage is of type notification")
-            self.simple_id_response(id, False)
-            self.logger.debug(
-                f"Notification response for id {id} has been sent"
-            )
             return
 
         self.logger.info(f"Mesage with id {id} is of type request")
@@ -84,7 +77,7 @@ class SimpleServer:
     def cancel_all_ids_except_newest(self) -> None:
         self.logger.info("Cancelling all old id's")
 
-        # NOTE: Used to be list comprehension but thats ugly
+        # NOTE: It used to be list comprehension but that was ugly
         ids = []
         for request in list(self.newest_requests.values()):
             if request is not None:
@@ -132,7 +125,7 @@ class SimpleServer:
             response["cancelled"] = True
         else:
             self.logger.debug(f"Running user function for command {command}")
-            response["result"] = self.commands[command](request)
+            response["result"] = self.commands[command](self, request)
 
         self.logger.debug("Response created")
         self.response_queue.put(response)
@@ -155,7 +148,19 @@ class SimpleServer:
         self.cancel_all_ids_except_newest()
 
         # Actual work
-        for request in list(self.newest_requests.values()):
+        requests_list: list[Request] = [
+            request
+            for request in self.newest_requests.values()
+            if request is not None
+        ]
+        requests_list = sorted(
+            requests_list,
+            key=lambda request: (
+                request["command"] not in self.priority_commands,
+            ),
+        )
+
+        for request in requests_list:
             if request is None:
                 continue
             command: str = request["command"]
