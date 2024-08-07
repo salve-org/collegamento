@@ -44,6 +44,8 @@ class FileClient(SimpleClient):
 
         super().__init__(commands, id_max, FileServer)
 
+        self.priority_commands = ["FileNotification"]
+
     def create_server(self) -> None:
         """Creates the main_server through a subprocess - internal API"""
 
@@ -121,9 +123,13 @@ class FileServer(SimpleServer):
     ) -> None:
         self.files: dict[str, str] = {}
 
-        super().__init__(commands, response_queue, requests_queue, logger)
-
-        self.priority_commands: list[str] = ["FileNotification"]
+        super().__init__(
+            commands,
+            response_queue,
+            requests_queue,
+            logger,
+            ["FileNotification"],
+        )
 
     def handle_request(self, request: Request) -> None:
         if "file" in request and request["command"] != "FileNotification":

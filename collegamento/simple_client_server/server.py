@@ -21,6 +21,7 @@ class SimpleServer:
         response_queue: GenericQueueClass,
         requests_queue: GenericQueueClass,
         logger: Logger,
+        priority_commands: list[str] = [],
     ) -> None:
         self.logger: Logger = logger
         self.logger.info("Starting server setup")
@@ -30,7 +31,7 @@ class SimpleServer:
         self.all_ids: list[int] = []
         self.newest_ids: dict[str, int] = {}
         self.newest_requests: dict[str, Request | None] = {}
-        self.priority_commands: list[str] = []
+        self.priority_commands: list[str] = priority_commands
 
         self.commands: dict[str, USER_FUNCTION] = commands
         for command in self.commands:
@@ -147,8 +148,18 @@ class SimpleServer:
         self.cancel_all_ids_except_newest()
 
         # Actual work
-        requests_list: list[Request] = [request for request in self.newest_requests.values() if request is not None]
-        requests_list = sorted(requests_list, key=lambda request: (request["command"] in self.priority_commands))
+        requests_list: list[Request] = [
+            request
+            for request in self.newest_requests.values()
+            if request is not None
+        ]
+        requests_list = sorted(
+            requests_list,
+            key=lambda request: (
+                request["command"] not in self.priority_commands,
+            ),
+        )
+
         for request in requests_list:
             if request is None:
                 continue
