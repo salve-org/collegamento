@@ -1,6 +1,12 @@
 from time import sleep
 
-from collegamento import USER_FUNCTION, Request, Response, SimpleClient, SimpleServer
+from collegamento import (
+    USER_FUNCTION,
+    Request,
+    Response,
+    SimpleClient,
+    SimpleServer,
+)
 
 
 def foo(server: "SimpleServer", bar: Request) -> bool:

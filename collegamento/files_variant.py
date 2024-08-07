@@ -1,6 +1,6 @@
 from logging import Logger
 from multiprocessing.queues import Queue as GenericQueueClass
-from typing import Mapping, NotRequired
+from typing import NotRequired
 
 from .simple_client_server import (
     USER_FUNCTION,
@@ -15,6 +15,7 @@ class FileRequest(Request):
     # There may be commands that don't require a file but some might
     file: NotRequired[str]
 
+
 def update_files(server: "FileServer", request: Request) -> None:
     file: str = request["file"]  # type: ignore
 
@@ -25,9 +26,7 @@ def update_files(server: "FileServer", request: Request) -> None:
     else:
         contents: str = request["contents"]  # type: ignore
         server.files[file] = contents
-        server.logger.info(
-            f"File {file} has been updated with new contents"
-        )
+        server.logger.info(f"File {file} has been updated with new contents")
 
 
 class FileClient(SimpleClient):

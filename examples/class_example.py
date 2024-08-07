@@ -1,6 +1,6 @@
 from time import sleep
 
-from collegamento import FileClient, Request, FileServer
+from collegamento import FileClient, FileServer, Request
 
 
 class MyClient:

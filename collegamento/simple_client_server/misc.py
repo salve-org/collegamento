@@ -1,4 +1,3 @@
-from typing import Any
 from multiprocessing.queues import Queue as GenericQueueClass
 from typing import TYPE_CHECKING, Any, NotRequired, TypedDict
 
@@ -16,6 +15,7 @@ class Request(Message):
     """Request from the IPC class to the server with command specific input"""
 
     command: str
+
 
 class Response(Message):
     """Server responses to requests and notifications"""

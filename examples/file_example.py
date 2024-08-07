@@ -1,6 +1,12 @@
 from time import sleep
 
-from collegamento import USER_FUNCTION, FileClient, Request, Response, FileServer
+from collegamento import (
+    USER_FUNCTION,
+    FileClient,
+    FileServer,
+    Request,
+    Response,
+)
 
 
 def split_str(server: "FileServer", arg: Request) -> list[str]:
