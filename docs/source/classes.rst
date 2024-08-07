@@ -30,10 +30,16 @@ The ``Response`` class is what is returned by the "ref:`SimpleClient Overview` o
 
 The ``SimpleClient`` class can do:
 
-- ``SimpleClient.notify_server(notification_dict: dict)`` (as a base class, this has no use case, but it will likely be used by any given subclass)
 - ``SimpleClient.request(request_details: dict)`` (all details in request_details are specific to the command in the request_details)
 - ``SimpleClient.add_command(name: str, command: USER_FUNCTION)`` (adds the function with the name provided that takes input of :ref:`Request Overview` and returns anything``
 - ``SimpleClient.kill_IPC()`` (kills the IPC server)
+
+.. _SimpleServer Overview:
+
+``SimpleServer``
+****************
+
+The SimpleServer is a backend piece of code made visible for commands that can be given to a ``SimpleClient``. If you want to know more about it, check out the source code ;).
 
 .. _FileClient Overview:
 
@@ -46,3 +52,10 @@ The ``SimpleClient`` class can do:
 - ``FileClient.remove_file(file: str)`` (removes the file specified from the system and notifies the server to fo the same)
 
 This class also has some changed functionality. When you make a ``.request()`` and add a file to the request, it chnages the request's name to its contents for the function to use.
+
+.. _FileServer Overview:
+
+``FileServer``
+**************
+
+The ``FileServer`` is a backend piece of code made visible for commands that can be given to a ``FileClient``. If you want to know more about it, check out the source code ;).

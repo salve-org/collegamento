@@ -1,9 +1,15 @@
 from time import sleep
 
-from collegamento import USER_FUNCTION, Request, Response, SimpleClient
+from collegamento import (
+    USER_FUNCTION,
+    Request,
+    Response,
+    SimpleClient,
+    SimpleServer,
+)
 
 
-def foo(bar: Request) -> bool:
+def foo(server: SimpleServer, bar: Request) -> bool:
     if bar["command"] == "test":
         return True
     return False
