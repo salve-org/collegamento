@@ -1,11 +1,10 @@
 from logging import Logger
 from multiprocessing.queues import Queue as GenericQueueClass
-from typing import NotRequired
+from typing import Mapping, NotRequired
 
 from .simple_client_server import (
     USER_FUNCTION,
     CollegamentoError,
-    Notification,
     Request,
     SimpleClient,
     SimpleServer,
@@ -16,11 +15,19 @@ class FileRequest(Request):
     # There may be commands that don't require a file but some might
     file: NotRequired[str]
 
+def update_files(server: "FileServer", request: Request) -> None:
+    file: str = request["file"]  # type: ignore
 
-class FileNotification(Notification):
-    file: str
-    remove: bool
-    contents: NotRequired[str]
+    if request["remove"]:  # type: ignore
+        server.logger.info(f"File {file} was requested for removal")
+        server.files.pop(file)
+        server.logger.info(f"File {file} has been removed")
+    else:
+        contents: str = request["contents"]  # type: ignore
+        server.files[file] = contents
+        server.logger.info(
+            f"File {file} has been updated with new contents"
+        )
 
 
 class FileClient(SimpleClient):
@@ -33,6 +40,8 @@ class FileClient(SimpleClient):
         self, commands: dict[str, USER_FUNCTION], id_max: int = 15_000
     ) -> None:
         self.files: dict[str, str] = {}
+
+        commands["FileNotification"] = update_files
 
         super().__init__(commands, id_max, FileServer)
 
@@ -71,14 +80,15 @@ class FileClient(SimpleClient):
         self.files[file] = current_state
 
         self.logger.debug("Creating notification dict")
-        notification: dict = {
+        file_notification: dict = {
+            "command": "FileNotification",
             "file": file,
             "remove": False,
             "contents": self.files[file],
         }
 
         self.logger.debug("Notifying server of file update")
-        super().notify_server(notification)
+        self.request(file_notification)
 
     def remove_file(self, file: str) -> None:
         """Removes a file from the main_server - external API"""
@@ -91,12 +101,13 @@ class FileClient(SimpleClient):
             )
 
         self.logger.info("Notifying server of file deletion")
-        notification: dict = {
+        file_notification: dict = {
+            "command": "FileNotification",
             "file": file,
             "remove": True,
         }
         self.logger.debug("Notifying server of file removal")
-        super().notify_server(notification)
+        self.request(file_notification)
 
 
 class FileServer(SimpleServer):
@@ -113,33 +124,8 @@ class FileServer(SimpleServer):
 
         super().__init__(commands, response_queue, requests_queue, logger)
 
-    def parse_line(self, message: Request | Notification) -> None:
-        self.logger.debug("Parsing Message from user - pre-super")
-        id: int = message["id"]
-
-        if message["type"] == "notification":
-            self.logger.debug("Mesage is of type notification")
-
-            file: str = message["file"]  # type: ignore
-
-            if message["remove"]:  # type: ignore
-                self.logger.info(f"File {file} was requested for removal")
-                self.files.pop(file)
-                self.logger.info(f"File {file} has been removed")
-            else:
-                contents: str = message["contents"]  # type: ignore
-                self.files[file] = contents
-                self.logger.info(
-                    f"File {file} has been updated with new contents"
-                )
-
-            self.simple_id_response(id, False)
-            return
-
-        super().parse_line(message)
-
     def handle_request(self, request: Request) -> None:
-        if "file" in request:
+        if "file" in request and request["command"] != "FileNotification":
             file = request["file"]
             request["file"] = self.files[file]
 

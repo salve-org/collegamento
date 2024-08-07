@@ -1,13 +1,12 @@
 from time import sleep
 
-from collegamento import USER_FUNCTION, FileClient, Request, Response
+from collegamento import USER_FUNCTION, FileClient, Request, Response, FileServer
 
-
-def func(test_arg: Request) -> bool:
+def func(server: FileServer, request: Request) -> bool:
     return True
 
 
-def split_str(arg: Request) -> list[str]:
+def split_str(server: FileServer, arg: Request) -> list[str]:
     file = arg["file"]  # type: ignore
     return file.split(" ")
 

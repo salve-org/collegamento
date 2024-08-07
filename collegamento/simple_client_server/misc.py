@@ -1,3 +1,4 @@
+from typing import Any
 from multiprocessing.queues import Queue as GenericQueueClass
 from typing import TYPE_CHECKING, Any, NotRequired, TypedDict
 
@@ -16,13 +17,6 @@ class Request(Message):
 
     command: str
 
-
-class Notification(Message):
-    """Notifies the server to store or update its storage of something"""
-
-    contents: NotRequired[Any]
-
-
 class Response(Message):
     """Server responses to requests and notifications"""
 
@@ -31,11 +25,11 @@ class Response(Message):
     result: NotRequired[Any]
 
 
-USER_FUNCTION = Callable[[Request], Any]
+USER_FUNCTION = Callable[["SimpleServer", Request], Any]  # type: ignore
 
 if TYPE_CHECKING:
     ResponseQueueType = GenericQueueClass[Response]
-    RequestQueueType = GenericQueueClass[Request | Notification]
+    RequestQueueType = GenericQueueClass[Request]
 # Else, this is CPython < 3.12. We are now in the No Man's Land
 # of Typing. In this case, avoid subscripting "GenericQueue". Ugh.
 else:
