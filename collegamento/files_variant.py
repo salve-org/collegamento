@@ -44,8 +44,6 @@ class FileClient(SimpleClient):
 
         super().__init__(commands, id_max, FileServer)
 
-        self.priority_commands = ["FileNotification"]
-
     def create_server(self) -> None:
         """Creates the main_server through a subprocess - internal API"""
 
