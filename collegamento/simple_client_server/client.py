@@ -65,6 +65,9 @@ class SimpleClient:
     def create_message_id(self) -> int:
         """Creates a Message based on the args and kwawrgs provided. Highly flexible. - internal API"""
         self.logger.info("Creating message for server")
+
+        # In cases where there are many many requests being sent it may be faster to choose a
+        # random id than to iterate through the list of id's and find an unclaimed one
         id = randint(1, self.id_max)  # 0 is reserved for the empty case
         while id in self.all_ids:
             id = randint(1, self.id_max)

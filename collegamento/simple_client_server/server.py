@@ -1,5 +1,4 @@
 from logging import Logger
-from multiprocessing.queues import Queue as GenericQueueClass
 from time import sleep
 from typing import Any
 
@@ -18,8 +17,8 @@ class SimpleServer:
     def __init__(
         self,
         commands: dict[str, USER_FUNCTION],
-        response_queue: GenericQueueClass,
-        requests_queue: GenericQueueClass,
+        response_queue: ResponseQueueType,
+        requests_queue: RequestQueueType,
         logger: Logger,
         priority_commands: list[str] = [],
     ) -> None:
@@ -153,12 +152,25 @@ class SimpleServer:
             for request in self.newest_requests.values()
             if request is not None
         ]
-        requests_list = sorted(
-            requests_list,
-            key=lambda request: (
-                request["command"] not in self.priority_commands,
-            ),
-        )
+
+        def sort_func(request: Request) -> tuple[bool, int]:
+            command_index: int = 0
+            in_priority_commands: bool = (
+                request["command"] in self.priority_commands
+            )
+
+            if in_priority_commands:
+                command_index = self.priority_commands.index(
+                    request["command"]
+                )
+                print(command_index)
+
+            return (
+                not in_priority_commands,
+                command_index,
+            )  # It it sorts False before True
+
+        requests_list = sorted(requests_list, key=sort_func)
 
         for request in requests_list:
             if request is None:
