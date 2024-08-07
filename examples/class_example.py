@@ -29,7 +29,6 @@ class MyClient:
 def main():
     mc = MyClient()
     mc.change_file("Test File")
-    sleep(1)
     mc.request_split()
 
     sleep(1)
