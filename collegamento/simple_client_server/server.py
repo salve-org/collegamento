@@ -30,6 +30,7 @@ class SimpleServer:
         self.all_ids: list[int] = []
         self.newest_ids: dict[str, int] = {}
         self.newest_requests: dict[str, Request | None] = {}
+        self.priority_commands: list[str] = []
 
         self.commands: dict[str, USER_FUNCTION] = commands
         for command in self.commands:
@@ -146,7 +147,9 @@ class SimpleServer:
         self.cancel_all_ids_except_newest()
 
         # Actual work
-        for request in list(self.newest_requests.values()):
+        requests_list: list[Request] = [request for request in self.newest_requests.values() if request is not None]
+        requests_list = sorted(requests_list, key=lambda request: (request["command"] in self.priority_commands))
+        for request in requests_list:
             if request is None:
                 continue
             command: str = request["command"]

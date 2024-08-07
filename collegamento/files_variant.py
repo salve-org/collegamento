@@ -87,7 +87,7 @@ class FileClient(SimpleClient):
         }
 
         self.logger.debug("Notifying server of file update")
-        self.request(file_notification)
+        super().request(file_notification)
 
     def remove_file(self, file: str) -> None:
         """Removes a file from the main_server - external API"""
@@ -106,7 +106,7 @@ class FileClient(SimpleClient):
             "remove": True,
         }
         self.logger.debug("Notifying server of file removal")
-        self.request(file_notification)
+        super().request(file_notification)
 
 
 class FileServer(SimpleServer):
@@ -122,6 +122,8 @@ class FileServer(SimpleServer):
         self.files: dict[str, str] = {}
 
         super().__init__(commands, response_queue, requests_queue, logger)
+
+        self.priority_commands: list[str] = ["FileNotification"]
 
     def handle_request(self, request: Request) -> None:
         if "file" in request and request["command"] != "FileNotification":

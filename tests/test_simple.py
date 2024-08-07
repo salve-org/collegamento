@@ -20,9 +20,6 @@ def test_Client_Server():
     context = SimpleClient(commands)
 
     context.request({"command": "test"})
-
-    sleep(1)
-
     context.add_command("test1", foo)
 
     sleep(1)
