@@ -11,5 +11,5 @@ from .simple_client_server import (  # noqa: F401, E402
     SimpleClient,
     SimpleServer,
     RequestQueueType,
-    ResponseQueueType
+    ResponseQueueType,
 )
