@@ -1,11 +1,12 @@
 from logging import Logger
-from multiprocessing.queues import Queue as GenericQueueClass
 from typing import NotRequired
 
 from .simple_client_server import (
     USER_FUNCTION,
     CollegamentoError,
     Request,
+    RequestQueueType,
+    ResponseQueueType,
     SimpleClient,
     SimpleServer,
 )
@@ -43,8 +44,6 @@ class FileClient(SimpleClient):
         commands["FileNotification"] = update_files
 
         super().__init__(commands, id_max, FileServer)
-
-        self.priority_commands = ["FileNotification"]
 
     def create_server(self) -> None:
         """Creates the main_server through a subprocess - internal API"""
@@ -117,8 +116,8 @@ class FileServer(SimpleServer):
     def __init__(
         self,
         commands: dict[str, USER_FUNCTION],
-        response_queue: GenericQueueClass,
-        requests_queue: GenericQueueClass,
+        response_queue: ResponseQueueType,
+        requests_queue: RequestQueueType,
         logger: Logger,
     ) -> None:
         self.files: dict[str, str] = {}
