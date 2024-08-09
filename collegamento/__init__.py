@@ -7,9 +7,9 @@ from .simple_client_server import (  # noqa: F401, E402
     USER_FUNCTION,
     CollegamentoError,
     Request,
+    RequestQueueType,
     Response,
+    ResponseQueueType,
     SimpleClient,
     SimpleServer,
-    RequestQueueType,
-    ResponseQueueType,
 )
