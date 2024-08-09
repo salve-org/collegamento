@@ -10,4 +10,6 @@ from .simple_client_server import (  # noqa: F401, E402
     Response,
     SimpleClient,
     SimpleServer,
+    RequestQueueType,
+    ResponseQueueType
 )

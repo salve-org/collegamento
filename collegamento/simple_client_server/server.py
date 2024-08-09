@@ -163,7 +163,6 @@ class SimpleServer:
                 command_index = self.priority_commands.index(
                     request["command"]
                 )
-                print(command_index)
 
             return (
                 not in_priority_commands,
