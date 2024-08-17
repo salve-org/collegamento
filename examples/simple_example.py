@@ -27,7 +27,7 @@ def main():
     if output is not None and output["result"]:  # type: ignore
         print("Yippee! It worked!")
     else:
-        print("Aww, maybe your compute is just a little slow?")
+        print("Aww, maybe your computer is just a little slow?")
 
     context.kill_IPC()
 
