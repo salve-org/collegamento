@@ -1,3 +1,5 @@
+from time import sleep
+
 from collegamento import (
     USER_FUNCTION,
     Request,
@@ -18,6 +20,8 @@ def main():
     context = SimpleClient(commands)
 
     context.request({"command": "test"})
+
+    sleep(1)
 
     output: Response | None = context.get_response("test")
     if output is not None and output["result"]:  # type: ignore
