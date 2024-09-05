@@ -9,34 +9,46 @@ from collegamento import (
 )
 
 
-def foo(server: SimpleServer, bar: Request) -> bool:
+def foo(server: "SimpleServer", bar: Request) -> bool:
     if bar["command"] == "test":
         return True
     return False
 
 
-def test_Client_Server():
-    commands: dict[str, USER_FUNCTION] = {"test": foo}
-    context = SimpleClient(commands)
+def main():
+    commands: dict[str, tuple[USER_FUNCTION, bool]] = {
+        "test": (foo, False),
+        "testMulti": (foo, True),
+    }
+    context = SimpleClient(commands)  # type: ignore
 
-    context.request({"command": "test"})
-    context.add_command("test1", foo)
-
-    sleep(1)
-
-    output: Response | None = context.get_response("test")
-
-    assert output is not None  # noqa: E711
-    assert output["result"] == True  # noqa: E712 # type: ignore
-
-    context.request({"command": "test1"})
+    output = context.request({"command": "test"})
+    assert output is None
+    id1 = context.request({"command": "testMulti"})
+    id2 = context.request({"command": "testMulti"})
 
     sleep(1)
 
-    output: Response | None = context.get_response("test1")
-    assert output is not None  # noqa: E711
-    assert output["result"] == False  # noqa: E712 # type: ignore
+    output1: Response | None = context.get_response(id1)
+    output2: Response | None = context.get_response(id2)
+    assert output1 and output2
 
-    assert context.all_ids == []
+    context.add_command("test2", foo)
+    context.add_command("testMulti2", foo, True)
+
+    output = context.request({"command": "test2"})
+    assert output is None
+    id2 = context.request({"command": "testMulti2"})
+    id2 = context.request({"command": "testMulti2"})
+
+    sleep(1)
+
+    output1: Response | None = context.get_response(id1)
+    output2: Response | None = context.get_response(id2)
+    assert output1 and output2
 
     context.kill_IPC()
+
+
+if __name__ == "__main__":
+    main()

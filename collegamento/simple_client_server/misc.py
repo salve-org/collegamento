@@ -1,14 +1,20 @@
 from multiprocessing.queues import Queue as GenericQueueClass
 from typing import TYPE_CHECKING, Any, NotRequired, TypedDict
+from enum import Flag, auto
 
 from beartype.typing import Callable
+
+
+class CollegamentoFlags(Flag):
+    MULTI_REQUESTS = auto()
+    POOL = MULTI_REQUESTS | auto()
 
 
 class Message(TypedDict):
     """Base class for messages in and out of the server"""
 
     id: int
-    type: str  # Can be "request", "response", "notification"
+    type: str  # Can be "request" or "response"
 
 
 class Request(Message):
@@ -26,6 +32,9 @@ class Response(Message):
 
 
 USER_FUNCTION = Callable[["SimpleServer", Request], Any]  # type: ignore
+COMMANDS_MAPPING = dict[
+    str, USER_FUNCTION | tuple[USER_FUNCTION, bool]
+]  # if bool is true the command allows multiple requests
 
 if TYPE_CHECKING:
     ResponseQueueType = GenericQueueClass[Response]

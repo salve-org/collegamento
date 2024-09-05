@@ -5,6 +5,7 @@ beartype_this_package()
 from .files_variant import FileClient, FileServer  # noqa: F401, E402
 from .simple_client_server import (  # noqa: F401, E402
     USER_FUNCTION,
+    COMMANDS_MAPPING,
     CollegamentoError,
     Request,
     RequestQueueType,
