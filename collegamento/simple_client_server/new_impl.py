@@ -337,18 +337,24 @@ class Client:
 
         id: int = self.create_message_id()
 
-        # self.current_ids[command] = id
-        # final_request: Request = {
-        #     "id": id,
-        #     "type": "request",
-        #     "command": command,
-        # }
-        # final_request.update(request_details)  # type: ignore
-        # self.logger.debug(f"Request created: {final_request}")
+        final_request: Request = {
+            "id": id,
+            "type": "request",
+            "command": command,
+        }
+        final_request.update(request_details)
 
-        # self.request_queue.put(final_request)
-        # self.logger.info("Message sent")
+        if self.commands[command][1]:
+            self.current_ids[id] = command
 
+        self.current_ids[command] = id
+        self.logger.debug(f"Request created: {final_request}")
+
+        self.request_queue.put(final_request)
+        self.logger.info("Message sent")
+
+        if self.commands[command][1]:
+            return id
 
     def kill_IPC(self):
         """Kills the internal Process and frees up some storage and CPU that may have been used otherwise - external API"""
@@ -363,8 +369,16 @@ if __name__ == "__main__":
     from test_func import foo
 
     # Mini tests
-    Client({"foo": (foo, True)})
-    x = Client({"foo": foo})
+    Client({"foo": foo})
+    x = Client({"foo": (foo, True), "foo2": foo})
+    id1 = x.request({"command": "foo"})
+    id2 = x.request({"command": "foo"})
+    id3 = x.request({"command": "foo2"})
+    id4 = x.request({"command": "foo2"}) # If you see four "Foo called"'s, thats bad news bears
+    assert id1 is not None
+    assert id2 is not None
+    assert id3 is None
+    assert id4 is None
     sleep(1)
     x.create_server()
     Client()

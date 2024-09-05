@@ -1,2 +1,2 @@
-def foo(*args):
-    return
+def foo(server, request):
+    print("Foo called", request["id"])
