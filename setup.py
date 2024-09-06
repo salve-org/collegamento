@@ -27,5 +27,5 @@ setup(
         "License :: OSI Approved :: MIT License",
         "Typing :: Typed",
     ],
-    packages=["collegamento", "collegamento.sclient_server"],
+    packages=["collegamento", "collegamento.client_server"],
 )
