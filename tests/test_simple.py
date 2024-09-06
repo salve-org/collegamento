@@ -1,6 +1,6 @@
 from time import sleep
 
-from collegamento import Response, Client
+from collegamento import Client, Response
 
 
 def foo(server, request):
@@ -25,7 +25,7 @@ def main():
 
     sleep(1)
 
-    x.check_responses() # Not necessary, we're just checking that doing
+    x.check_responses()  # Not necessary, we're just checking that doing
     # this first doesn't break get_response
 
     foo_r: list[Response] = x.get_response("foo")

@@ -1,4 +1,3 @@
-from enum import Flag, auto
 from multiprocessing.queues import Queue as GenericQueueClass
 from typing import TYPE_CHECKING, Any, NotRequired, TypedDict
 

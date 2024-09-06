@@ -1,14 +1,15 @@
+# TODO: Actually fix this section of the package
 from logging import Logger
 from typing import NotRequired
 
 from .simple_client_server import (
     USER_FUNCTION,
+    Client,
     CollegamentoError,
     Request,
     RequestQueueType,
     ResponseQueueType,
-    SimpleClient,
-    SimpleServer,
+    Server,
 )
 
 
@@ -30,7 +31,7 @@ def update_files(server: "FileServer", request: Request) -> None:
         server.logger.info(f"File {file} has been updated with new contents")
 
 
-class FileClient(SimpleClient):
+class FileClient(Client):
     """File handling variant of SImpleClient. Extra methods:
     - FileClient.update_file()
     - FileClient.remove_file()
@@ -110,7 +111,7 @@ class FileClient(SimpleClient):
         super().request(file_notification)
 
 
-class FileServer(SimpleServer):
+class FileServer(Server):
     """File handling variant of SimpleServer"""
 
     def __init__(
