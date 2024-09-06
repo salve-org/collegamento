@@ -30,7 +30,7 @@ The ``Response`` class is what is returned by the "ref:`Client Overview` or one 
 
 The ``Client`` class can do:
 
-- ``Client.request(request_details: dict)`` (all details in request_details are specific to the command in the request_details)
+- ``Client.request(command: str, **kwargs)``
 - ``Client.add_command(name: str, command: USER_FUNCTION, multiple_requests: bool = False)`` (adds the function with the name provided that takes input of :ref:`Request Overview` and returns anything)
 - ``Client.get_response(command: str) -> Response | list[Response] | None`` (returns a list of ``Response``'s if the command allows multiple requests otherwise a single ``Response`` if there is were any responses ohterwise ``None``)
 - ``Client.kill_IPC()`` (kills the IPC server)
@@ -43,6 +43,8 @@ When using the ``Client`` class you give the commands as a dict. Below are the w
 By default ``Collegamento`` assumes you only want the newest request but chooses to still give the option to make multiple requests. For ``.get_response()`` the output changes based on how this was specified by giving ``None`` if there was no response, ``Response`` if the command only allows the newest request, and ``list[Response]`` if it allows multiple regardless of how many times you made a request for it.
 
 Note that because of the way that the commands are handed to the ``Server`` and run, they can actually modify its attributes and theoretically even the functions the ``Server`` runs. This high flexibility also requires the user to ensure that they properly manage any attributes they mess with.
+
+When it comes to requesting the server to run a command, you give the command as the first argument and all subsequent args for the function the ``Server`` calls are given as kwargs that are passed on.
 
 .. _Server Overview:
 

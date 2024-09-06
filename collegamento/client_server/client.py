@@ -110,13 +110,9 @@ class Client:
 
         return id
 
-    def request(
-        self,
-        request_details: dict,
-    ) -> None:
+    def request(self, command: str, **kwargs) -> None:
         """Sends the main process a request of type command with given kwargs - external API"""
 
-        command = request_details["command"]
         if command not in self.commands:
             raise CollegamentoError(
                 f"Command {command} not in builtin commands. Those are {self.commands}!"
@@ -129,7 +125,7 @@ class Client:
             "type": "request",
             "command": command,
         }
-        final_request.update(request_details)
+        final_request.update(**kwargs)
 
         if self.commands[command][1]:
             self.current_ids[id] = command
