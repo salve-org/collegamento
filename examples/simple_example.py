@@ -4,27 +4,26 @@ from collegamento import (
     USER_FUNCTION,
     Request,
     Response,
-    SimpleClient,
-    SimpleServer,
+    Client,
+    Server,
 )
 
 
-def foo(server: "SimpleServer", bar: Request) -> bool:
+def foo(server: "Server", bar: Request) -> bool:
     if bar["command"] == "test":
         return True
     return False
 
 
 def main():
-    commands: dict[str, USER_FUNCTION] = {"test": foo}
-    context = SimpleClient(commands)
+    context = Client({"test": foo})
 
     context.request({"command": "test"})
 
     sleep(1)
 
-    output: Response | None = context.get_response("test")
-    if output is not None and output["result"]:  # type: ignore
+    output: list[Response] = context.get_response("test")
+    if output and output[0]["result"]:  # type: ignore
         print("Yippee! It worked!")
     else:
         print("Aww, maybe your computer is just a little slow?")

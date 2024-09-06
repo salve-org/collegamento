@@ -16,6 +16,7 @@ def test_file_variants():
     context = FileClient({"test": func})
 
     context.update_file("test", "test contents")
+    context.update_file("test2", "test contents2")
     context.request({"command": "test"})
 
     sleep(1)
@@ -24,14 +25,16 @@ def test_file_variants():
     assert output is not None  # noqa: E711
     assert output[0]["result"] is True  # noqa: E712 # type: ignore
 
-    context.add_command("test1", split_str)
+    context.add_command("test1", split_str, True)
     context.request({"command": "test1", "file": "test"})
+    context.request({"command": "test1", "file": "test2"})
 
     sleep(1)
 
     output = context.get_response("test1")
     assert output is not None  # noqa: E711
     assert output[0]["result"] == ["test", "contents"]  # noqa: E712 # type: ignore
+    assert output[1]["result"] == ["test", "contents2"]  # noqa: E712 # type: ignore
 
     assert context.all_ids == []
 

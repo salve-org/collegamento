@@ -15,8 +15,7 @@ def split_str(server: "FileServer", arg: Request) -> list[str]:
 
 
 def main():
-    commands: dict[str, USER_FUNCTION] = {"test": split_str}
-    context = FileClient(commands)
+    context = FileClient({"test": split_str})
 
     context.update_file("test", "test contents")
     sleep(1)
@@ -24,7 +23,7 @@ def main():
 
     sleep(1)
 
-    output: Response | None = context.get_response("test")
+    output: list[Response] = context.get_response("test")
     print(output)
 
     context.kill_IPC()

@@ -1,4 +1,3 @@
-# TODO: Actually fix this section of the package
 from typing import NotRequired
 
 from .client_server import (
@@ -39,7 +38,7 @@ class FileClient(Client):
     ) -> None:
         self.files: dict[str, str] = {}
 
-        commands["FileNotification"] = update_files
+        commands["FileNotification"] = (update_files, True)
 
         super().__init__(commands, id_max, FileServer)
 

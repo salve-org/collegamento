@@ -41,6 +41,8 @@ def test_normal_client():
     x.check_responses()
     x.create_server()
 
+    assert x.all_ids == []
+
     Client()
     Client({"foo": foo}).request({"command": "foo"})
     Client().kill_IPC()
