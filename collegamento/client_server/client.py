@@ -15,7 +15,13 @@ from random import randint
 from time import sleep
 
 from .server import Server
-from .utils import USER_FUNCTION, CollegamentoError, Request, Response
+from .utils import (
+    COMMANDS_MAPPING,
+    USER_FUNCTION,
+    CollegamentoError,
+    Request,
+    Response,
+)
 
 
 class Client:
@@ -32,7 +38,7 @@ class Client:
 
     def __init__(
         self,
-        commands: dict[str, USER_FUNCTION | tuple[USER_FUNCTION, bool]] = {},
+        commands: COMMANDS_MAPPING = {},
         id_max: int = 15_000,
         server_type: type = Server,
     ) -> None:

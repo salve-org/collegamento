@@ -7,7 +7,7 @@ def foo(server, request):
     print("Foo called", request["id"])
 
 
-def main():
+def test_normal_client():
     Client({"foo": foo})
     x = Client({"foo": (foo, True), "foo2": foo})
 
@@ -47,7 +47,3 @@ def main():
     Client().create_server()
 
     sleep(1)
-
-
-if __name__ == "__main__":
-    main()
