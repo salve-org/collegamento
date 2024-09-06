@@ -23,7 +23,7 @@ def main():
 
     sleep(1)
 
-    output: list[Response] = context.get_response("test")
+    output: Response = context.get_response("test")  # type: ignore
     print(output)
 
     context.kill_IPC()

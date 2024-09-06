@@ -21,9 +21,9 @@ def test_file_variants():
 
     sleep(1)
 
-    output: list[Response] = context.get_response("test")
+    output: Response = context.get_response("test")  # type: ignore
     assert output is not None  # noqa: E711
-    assert output[0]["result"] is True  # noqa: E712 # type: ignore
+    assert output["result"] is True  # noqa: E712 # type: ignore
 
     context.add_command("test1", split_str, True)
     context.request({"command": "test1", "file": "test"})
@@ -31,7 +31,7 @@ def test_file_variants():
 
     sleep(1)
 
-    output = context.get_response("test1")
+    output: list[Response] = context.get_response("test1")  # type: ignore
     assert output is not None  # noqa: E711
     assert output[0]["result"] == ["test", "contents"]  # noqa: E712 # type: ignore
     assert output[1]["result"] == ["test", "contents2"]  # noqa: E712 # type: ignore

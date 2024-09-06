@@ -42,19 +42,14 @@ class Client:
         id_max: int = 15_000,
         server_type: type = Server,
     ) -> None:
-        """To initiate the Client class, you are not required to give any input.
+        """See tests, examples, and the file variant code to see how to give input.
 
-        Should you choose to give input, the options are as follows:
-        TODO: update the docstring
-        """
+        The most common input is commands and id_max. server_type is only really useful for wrappers."""
 
         self.all_ids: list[int] = []
         self.id_max = id_max
 
-        # If the user searches by a command they give a str and get a single Response as
-        # one can only search by command if it allows multiple Requests they give an int
-        # which corresponds to a Requests from a command that allows multiple Requests
-        # and it gives all Responses of that command
+        # int corresponds to str and str to int = int -> str & str -> int
         self.current_ids: dict[str | int, int | str] = {}
 
         self.newest_responses: dict[str, list[Response]] = {}
@@ -171,7 +166,7 @@ class Client:
         while not self.response_queue.empty():
             self.parse_response(self.response_queue.get())
 
-    def get_response(self, command: str) -> list[Response]:
+    def get_response(self, command: str) -> Response | list[Response] | None:
         """Checks responses and returns the current response of type command if it has been returned - external API"""
         if command not in self.commands:
             raise CollegamentoError(
@@ -181,7 +176,13 @@ class Client:
         self.check_responses()
         response: list[Response] = self.newest_responses[command]
         self.newest_responses[command] = []
-        # TODO: if we know that the command doesn't allow multiple requests don't give a list
+        if not len(response):
+            return None
+
+        # If we know that the command doesn't allow multiple requests don't give a list
+        if not self.commands[command][1]:
+            return response[0]
+
         return response
 
     def add_command(
@@ -215,51 +216,3 @@ class Client:
     def __del__(self):
         # Multiprocessing bugs arise if the Process is created, not saved, and not terminated
         self.main_process.terminate()
-
-
-if __name__ == "__main__":
-    from test_func import foo
-
-    # Mini tests
-    Client({"foo": foo})
-    x = Client({"foo": (foo, True), "foo2": foo})
-
-    x.request({"command": "foo"})
-    x.request({"command": "foo"})
-    x.request({"command": "foo2"})
-    x.request(
-        {"command": "foo2"}
-    )  # If you see six "Foo called"'s, thats bad news bears
-    x.add_command("foo3", foo)
-    x.request({"command": "foo3"})
-    x.add_command("foo4", foo, True)
-    x.request({"command": "foo4"})
-    x.request({"command": "foo4"})
-
-    sleep(1)
-
-    x.check_responses()  # Not necessary, we're just checking that doing
-    # this first doesn't break get_response
-
-    foo_r: list[Response] = x.get_response("foo")
-    foo_two_r: list[Response] = x.get_response("foo2")
-    foo_three_r: list[Response] = x.get_response("foo3")
-    foo_four_r: list[Response] = x.get_response("foo4")
-
-    assert len(foo_r) == 2
-    assert len(foo_two_r) == 1
-    assert len(foo_three_r) == 1
-    assert len(foo_four_r) == 2
-
-    x.check_responses()
-    x.create_server()
-
-    Client()
-    Client({"foo": foo}).request({"command": "foo"})
-    Client().kill_IPC()
-    Client().create_server()
-
-    sleep(1)
-
-    # from doctest import testmod
-    # testmod()

@@ -16,13 +16,15 @@ def foo(server: "Server", bar: Request) -> bool:
 
 
 def main():
+    # As of collegamento v0.3.0 you can allow multiple requests for the same command
+    # like so: {"test": (foo, True)} (using (foo, False)) is the default (only newest request)
     context = Client({"test": foo})
 
     context.request({"command": "test"})
 
     sleep(1)
 
-    output: list[Response] = context.get_response("test")
+    output: Response = context.get_response("test")  # type: ignore
     if output and output[0]["result"]:  # type: ignore
         print("Yippee! It worked!")
     else:

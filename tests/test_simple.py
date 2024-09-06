@@ -28,14 +28,14 @@ def test_normal_client():
     x.check_responses()  # Not necessary, we're just checking that doing
     # this first doesn't break get_response
 
-    foo_r: list[Response] = x.get_response("foo")
-    foo_two_r: list[Response] = x.get_response("foo2")
-    foo_three_r: list[Response] = x.get_response("foo3")
-    foo_four_r: list[Response] = x.get_response("foo4")
+    foo_r: list[Response] = x.get_response("foo")  # type: ignore
+    foo_two_r: Response = x.get_response("foo2")  # type: ignore
+    foo_three_r: Response = x.get_response("foo3")  # type: ignore
+    foo_four_r: list[Response] = x.get_response("foo4")  # type: ignore
 
     assert len(foo_r) == 2
-    assert len(foo_two_r) == 1
-    assert len(foo_three_r) == 1
+    assert foo_two_r
+    assert foo_three_r
     assert len(foo_four_r) == 2
 
     x.check_responses()
