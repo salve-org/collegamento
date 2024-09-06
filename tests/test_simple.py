@@ -1,53 +1,52 @@
 from time import sleep
 
-from collegamento import (
-    USER_FUNCTION,
-    Request,
-    Response,
-    SimpleClient,
-    SimpleServer,
-)
+from collegamento import Response, Client
 
 
-def foo(server: "SimpleServer", bar: Request) -> bool:
-    if bar["command"] == "test":
-        return True
-    return False
+def foo(server, request):
+    print("Foo called", request["id"])
 
 
 def main():
-    commands: dict[str, tuple[USER_FUNCTION, bool]] = {
-        "test": (foo, False),
-        "testMulti": (foo, True),
-    }
-    context = SimpleClient(commands)  # type: ignore
+    Client({"foo": foo})
+    x = Client({"foo": (foo, True), "foo2": foo})
 
-    output = context.request({"command": "test"})
-    assert output is None
-    id1 = context.request({"command": "testMulti"})
-    id2 = context.request({"command": "testMulti"})
-
-    sleep(1)
-
-    output1: Response | None = context.get_response(id1)
-    output2: Response | None = context.get_response(id2)
-    assert output1 and output2
-
-    context.add_command("test2", foo)
-    context.add_command("testMulti2", foo, True)
-
-    output = context.request({"command": "test2"})
-    assert output is None
-    id2 = context.request({"command": "testMulti2"})
-    id2 = context.request({"command": "testMulti2"})
+    x.request({"command": "foo"})
+    x.request({"command": "foo"})
+    x.request({"command": "foo2"})
+    x.request(
+        {"command": "foo2"}
+    )  # If you see six "Foo called"'s, thats bad news bears
+    x.add_command("foo3", foo)
+    x.request({"command": "foo3"})
+    x.add_command("foo4", foo, True)
+    x.request({"command": "foo4"})
+    x.request({"command": "foo4"})
 
     sleep(1)
 
-    output1: Response | None = context.get_response(id1)
-    output2: Response | None = context.get_response(id2)
-    assert output1 and output2
+    x.check_responses() # Not necessary, we're just checking that doing
+    # this first doesn't break get_response
 
-    context.kill_IPC()
+    foo_r: list[Response] = x.get_response("foo")
+    foo_two_r: list[Response] = x.get_response("foo2")
+    foo_three_r: list[Response] = x.get_response("foo3")
+    foo_four_r: list[Response] = x.get_response("foo4")
+
+    assert len(foo_r) == 2
+    assert len(foo_two_r) == 1
+    assert len(foo_three_r) == 1
+    assert len(foo_four_r) == 2
+
+    x.check_responses()
+    x.create_server()
+
+    Client()
+    Client({"foo": foo}).request({"command": "foo"})
+    Client().kill_IPC()
+    Client().create_server()
+
+    sleep(1)
 
 
 if __name__ == "__main__":

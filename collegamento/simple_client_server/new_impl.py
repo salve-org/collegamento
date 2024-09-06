@@ -264,7 +264,7 @@ class Client:
     def request(
         self,
         request_details: dict,
-    ) -> int | None:
+    ) -> None:
         """Sends the main process a request of type command with given kwargs - external API"""
 
         command = request_details["command"]
@@ -288,9 +288,6 @@ class Client:
         self.current_ids[command] = id
 
         self.request_queue.put(final_request)
-
-        if self.commands[command][1]:
-            return id
 
     def parse_response(self, res: Response) -> None:
         """Parses main process output and discards useless responses - internal API"""
@@ -319,6 +316,19 @@ class Client:
         """Checks all main process output by calling parse_line() on each response - internal API"""
         while not self.response_queue.empty():
             self.parse_response(self.response_queue.get())
+
+    def get_response(self, command: str) -> list[Response]:
+        """Checks responses and returns the current response of type command if it has been returned - external API"""
+        if command not in self.commands:
+            raise CollegamentoError(
+                f"Cannot get response of command {command}, valid commands are {self.commands}"
+            )
+
+        self.check_responses()
+        response: list[Response] = self.newest_responses[command]
+        self.newest_responses[command] = []
+        # TODO: if we know that the command doesn't allow multiple requests don't give a list
+        return response
 
     def add_command(
         self,
@@ -359,28 +369,42 @@ if __name__ == "__main__":
     # Mini tests
     Client({"foo": foo})
     x = Client({"foo": (foo, True), "foo2": foo})
-    id1 = x.request({"command": "foo"})
-    id2 = x.request({"command": "foo"})
-    id3 = x.request({"command": "foo2"})
-    id4 = x.request(
+
+    x.request({"command": "foo"})
+    x.request({"command": "foo"})
+    x.request({"command": "foo2"})
+    x.request(
         {"command": "foo2"}
-    )  # If you see four "Foo called"'s, thats bad news bears
+    )  # If you see six "Foo called"'s, thats bad news bears
     x.add_command("foo3", foo)
-    id5 = x.request({"command": "foo3"})
+    x.request({"command": "foo3"})
     x.add_command("foo4", foo, True)
-    id6 = x.request({"command": "foo4"})
-    assert id1 is not None
-    assert id2 is not None
-    assert id3 is None
-    assert id4 is None
-    assert id5 is None
-    assert id6 is not None
+    x.request({"command": "foo4"})
+    x.request({"command": "foo4"})
+
     sleep(1)
+
+    x.check_responses() # Not necessary, we're just checking that doing
+    # this first doesn't break get_response
+
+    foo_r: list[Response] = x.get_response("foo")
+    foo_two_r: list[Response] = x.get_response("foo2")
+    foo_three_r: list[Response] = x.get_response("foo3")
+    foo_four_r: list[Response] = x.get_response("foo4")
+
+    assert len(foo_r) == 2
+    assert len(foo_two_r) == 1
+    assert len(foo_three_r) == 1
+    assert len(foo_four_r) == 2
+
     x.check_responses()
     x.create_server()
+
     Client()
+    Client({"foo": foo}).request({"command": "foo"})
     Client().kill_IPC()
     Client().create_server()
+
     sleep(1)
 
     # from doctest import testmod
