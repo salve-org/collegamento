@@ -1,3 +1,4 @@
+# TODO: make sure everything is type hinted while removing redundancy
 """Defines the Client and Server class which provides a convenient and easy to use IPC interface.
 
 >>> def test(*args):
@@ -31,7 +32,7 @@ class Client:
     The public API includes the following methods:
     - Client.add_command(name: str, command: USER_FUNCTION, multiple_requests: bool = False)
     - Client.request(request_details: dict) -> None | int
-    - Client.get_response(command: str | int) -> Response | list[Response]
+    - Client.get_response(command: str) -> Response | list[Response] | None
     - Client.kill_IPC()
     """
 
