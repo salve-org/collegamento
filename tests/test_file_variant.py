@@ -1,12 +1,6 @@
 from time import sleep
 
-from collegamento import (
-    USER_FUNCTION,
-    FileClient,
-    FileServer,
-    Request,
-    Response,
-)
+from collegamento import FileClient, FileServer, Request, Response
 
 
 def func(server: FileServer, request: Request) -> bool:
