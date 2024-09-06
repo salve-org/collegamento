@@ -10,7 +10,6 @@
 >>> c.kill_IPC()
 """
 
-from logging import Logger, getLogger
 from multiprocessing import Process, Queue, freeze_support
 from random import randint
 from time import sleep
@@ -49,12 +48,8 @@ class Server:
         commands: dict[str, tuple[USER_FUNCTION, bool]],
         requests_queue: RequestQueueType,
         response_queue: ResponseQueueType,
-        logger: Logger,
         priority_commands: list[str] = [],  # Only used by subclasses
     ) -> None:
-        self.logger: Logger = logger
-        self.logger.info("Starting server setup")
-
         self.response_queue: ResponseQueueType = response_queue
         self.requests_queue: RequestQueueType = requests_queue
         self.all_ids: list[int] = []
@@ -67,38 +62,38 @@ class Server:
             self.newest_ids[command] = []
             self.newest_requests[command] = []
 
-        self.logger.info("Server setup complete")
-
         while True:
             self.run_tasks()
             sleep(0.0025)
 
     def simple_id_response(self, id: int, cancelled: bool = True) -> None:
-        self.logger.debug(f"Creating simple response for id {id}")
         response: Response = {
             "id": id,
             "type": "response",
             "cancelled": cancelled,
         }
-        self.logger.debug(f"Sending simple response for id {id}")
         self.response_queue.put(response)
-        self.logger.info(f"Simple response for id {id} sent")
 
     def parse_line(self, message: Request) -> None:
-        self.logger.debug("Parsing Message from user")
         id: int = message["id"]
 
         if message["type"] != "request":
-            self.logger.warning(
-                f"Unknown type {type}. Sending simple response"
-            )
             self.simple_id_response(id)
-            self.logger.debug(f"Simple response for id {id} sent")
             return
 
-        self.logger.info(f"Mesage with id {id} is of type request")
-        self.all_ids.append(id)
         command: str = message["command"]  # type: ignore
+
+        if command == "add-command":
+            request_name: str = message["name"]  # type: ignore
+
+            request_tuple: tuple[USER_FUNCTION, bool] = message["function"]  # type: ignore
+            self.commands[request_name] = request_tuple
+            self.newest_requests[request_name] = []
+            self.newest_ids[request_name] = []
+            self.simple_id_response(id)
+            return
+
+        self.all_ids.append(id)
 
         if not self.commands[command][1]:
             self.newest_ids[command] = []
@@ -106,11 +101,8 @@ class Server:
 
         self.newest_ids[command].append(id)
         self.newest_requests[command].append(message)
-        self.logger.debug("Request stored for parsing")
 
     def cancel_old_ids(self) -> None:
-        self.logger.info("Cancelling all old id's")
-
         accepted_ids = [
             request["id"]
             for request_list in list(self.newest_requests.values())
@@ -119,18 +111,11 @@ class Server:
 
         for request in self.all_ids:
             if request in accepted_ids:
-                self.logger.debug(
-                    f"Id {request} is an either the newest request or the command allows multiple requests"
-                )
                 continue
 
-            self.logger.debug(
-                f"Id {request} is an unwanted request, sending simple respone"
-            )
             self.simple_id_response(request)
 
         self.all_ids = []
-        self.logger.debug("All ids list cleaned up")
 
     def handle_request(self, request: Request) -> None:
         command: str = request["command"]
@@ -145,45 +130,22 @@ class Server:
             "command": command,
         }
 
-        if command == "add-command":
-            request_name: str = request["name"]  # type: ignore
-
-            request_tuple: tuple[USER_FUNCTION, bool] = request["function"]  # type: ignore
-            self.commands[request_name] = request_tuple
-            response["result"] = None
-            response["cancelled"] = True
-            self.logger.debug("Response created")
-            self.response_queue.put(response)
-            self.newest_ids[command].remove(id)
-            self.logger.info(f"Response sent for request of command {command}")
-            return
-
         if command not in self.commands:
-            self.logger.warning(f"Command {command} not recognized")
             response["result"] = None
             response["cancelled"] = True
         else:
-            self.logger.debug(f"Running user function for command {command}")
             response["result"] = self.commands[command][0](self, request)
 
-        self.logger.debug("Response created")
         self.response_queue.put(response)
         self.newest_ids[command].remove(id)
-        self.logger.info(f"Response sent for request of command {command}")
 
     def run_tasks(self) -> None:
         if self.requests_queue.empty():
             return
 
-        self.logger.debug("New request in queue")
         while not self.requests_queue.empty():
-            self.logger.debug("Parsing request")
             self.parse_line(self.requests_queue.get())
 
-        if not self.all_ids:
-            self.logger.debug("All requests were notifications")
-
-        self.logger.debug("Cancelling all old id's")
         self.cancel_old_ids()
 
         requests_list: list[Request] = [
@@ -204,10 +166,8 @@ class Server:
             if request is None:
                 continue
             command: str = request["command"]
-            self.logger.info(f"Handling request of command {command}")
             self.handle_request(request)
             self.newest_requests[command].remove(request)
-            self.logger.debug("Request completed")
 
 
 class Client:
@@ -230,10 +190,9 @@ class Client:
     ) -> None:
         """To initiate the Client class, you are not required to give any input.
 
-        Should you choose to give input, the
+        Should you choose to give input, the options are as follows:
+        TODO: update the docstring
         """
-        self.logger: Logger = getLogger("IPC")
-        self.logger.info("Initiating Client")
 
         self.all_ids: list[int] = []
         self.id_max = id_max
@@ -247,23 +206,22 @@ class Client:
         self.newest_responses: dict[str, list[Response]] = {}
         self.server_type = server_type
 
-        self.logger.debug("Parsing commands")
         self.commands: dict[str, tuple[USER_FUNCTION, bool]] = {}
 
         for command, func in commands.items():
             # We don't check types or length because beartype takes care of that for us
             if not isinstance(func, tuple):
                 self.commands[command] = (func, False)
+                self.newest_responses[command] = []
                 continue
 
             self.commands[command] = func
+            self.newest_responses[command] = []
 
-        self.logger.info("Creating Server")
         self.request_queue: Queue
         self.response_queue: Queue
         self.main_process: Process
         self.create_server()
-        self.logger.info("Initialization is complete")
 
     def create_server(self):
         """Creates a Server and terminates the old one if it exists - internal API"""
@@ -282,20 +240,13 @@ class Client:
                 self.commands,
                 self.request_queue,
                 self.response_queue,
-                self.logger,
             ),
             daemon=True,
         )
         self.main_process.start()
 
-    def log_exception(self, exception_str: str) -> None:
-        """Logs an exception and raises a CollegamentoError - internal API"""
-        self.logger.exception(exception_str)
-        raise CollegamentoError(exception_str)
-
     def create_message_id(self) -> int:
         """Creates a Message id - internal API"""
-        self.logger.info("Creating message for server")
 
         # In cases where there are many many requests being sent it may be faster to choose a
         # random id than to iterate through the list of id's and find an unclaimed one
@@ -304,13 +255,8 @@ class Client:
             id = randint(1, self.id_max)
         self.all_ids.append(id)
 
-        self.logger.debug("ID for message created")
-
         if not self.main_process.is_alive():
             # No point in an id if the server's dead
-            self.logger.critical(
-                "Server was killed at some point, creating server"
-            )
             self.create_server()
 
         return id
@@ -319,21 +265,13 @@ class Client:
         self,
         request_details: dict,
     ) -> int | None:
-        """Sends the main_server a request of type command with given kwargs - external API"""
-        self.logger.debug("Beginning request")
+        """Sends the main process a request of type command with given kwargs - external API"""
 
-        # NOTE: this variable could've been a standalone line but I thought it would just be better
-        # to use the walrus operator. No point in a language feature if its never used. Plus,
-        # it also looks quite nice :D
-        if (command := request_details["command"]) not in self.commands:
-            self.logger.exception(
-                f"Command {command} not in builtin commands. Those are {self.commands}!"
-            )
+        command = request_details["command"]
+        if command not in self.commands:
             raise CollegamentoError(
                 f"Command {command} not in builtin commands. Those are {self.commands}!"
             )
-
-        self.logger.info("Creating request for server")
 
         id: int = self.create_message_id()
 
@@ -348,13 +286,63 @@ class Client:
             self.current_ids[id] = command
 
         self.current_ids[command] = id
-        self.logger.debug(f"Request created: {final_request}")
 
         self.request_queue.put(final_request)
-        self.logger.info("Message sent")
 
         if self.commands[command][1]:
             return id
+
+    def parse_response(self, res: Response) -> None:
+        """Parses main process output and discards useless responses - internal API"""
+        id = res["id"]
+        self.all_ids.remove(id)
+
+        if "command" not in res:
+            return
+
+        command = res["command"]
+
+        if command == "add-command":
+            return
+
+        self.newest_responses[command].append(res)
+        self.current_ids[command] = 0
+
+        if self.commands[command][1]:
+            self.current_ids.pop(id)
+            return
+
+        if id != self.current_ids[command]:
+            return
+
+    def check_responses(self) -> None:
+        """Checks all main process output by calling parse_line() on each response - internal API"""
+        while not self.response_queue.empty():
+            self.parse_response(self.response_queue.get())
+
+    def add_command(
+        self,
+        name: str,
+        command: USER_FUNCTION,
+        multiple_requests: bool = False,
+    ) -> None:
+        if name == "add-command":
+            raise CollegamentoError(
+                "Cannot add command add-command as it is a special builtin"
+            )
+
+        id: int = self.create_message_id()
+        final_request: Request = {
+            "id": id,
+            "type": "request",
+            "command": "add-command",
+        }
+        command_tuple = (command, multiple_requests)
+        final_request.update({"name": name, "function": command_tuple})  # type: ignore
+
+        self.request_queue.put(final_request)
+        self.commands[name] = command_tuple
+        self.newest_responses[name] = []
 
     def kill_IPC(self):
         """Kills the internal Process and frees up some storage and CPU that may have been used otherwise - external API"""
@@ -374,12 +362,21 @@ if __name__ == "__main__":
     id1 = x.request({"command": "foo"})
     id2 = x.request({"command": "foo"})
     id3 = x.request({"command": "foo2"})
-    id4 = x.request({"command": "foo2"}) # If you see four "Foo called"'s, thats bad news bears
+    id4 = x.request(
+        {"command": "foo2"}
+    )  # If you see four "Foo called"'s, thats bad news bears
+    x.add_command("foo3", foo)
+    id5 = x.request({"command": "foo3"})
+    x.add_command("foo4", foo, True)
+    id6 = x.request({"command": "foo4"})
     assert id1 is not None
     assert id2 is not None
     assert id3 is None
     assert id4 is None
+    assert id5 is None
+    assert id6 is not None
     sleep(1)
+    x.check_responses()
     x.create_server()
     Client()
     Client().kill_IPC()
