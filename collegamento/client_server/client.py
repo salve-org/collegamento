@@ -12,7 +12,6 @@
 
 from multiprocessing import Process, Queue, freeze_support
 from random import randint
-from time import sleep
 
 from .server import Server
 from .utils import (
