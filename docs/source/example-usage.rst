@@ -22,7 +22,7 @@ Now that you have ``Collegamento`` installed, let's try running a simple example
         # like so: {"test": (foo, True)} (using (foo, False)) is the default (only newest request)
         context = Client({"test": foo})
 
-        context.request({"command": "test"})
+        context.request("test")
 
         sleep(1)
 

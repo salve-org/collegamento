@@ -17,7 +17,7 @@ def test_file_variants():
 
     context.update_file("test", "test contents")
     context.update_file("test2", "test contents2")
-    context.request({"command": "test"})
+    context.request("test")
 
     sleep(1)
 
@@ -26,8 +26,8 @@ def test_file_variants():
     assert output["result"] is True  # noqa: E712 # type: ignore
 
     context.add_command("test1", split_str, True)
-    context.request({"command": "test1", "file": "test"})
-    context.request({"command": "test1", "file": "test2"})
+    context.request("test1", file="test")
+    context.request("test1", file="test2")
 
     sleep(1)
 

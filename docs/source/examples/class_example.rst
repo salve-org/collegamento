@@ -19,7 +19,7 @@ Class Example
             self.context.update_file("user_file", new_contents)
     
         def request_split(self) -> None:
-            self.context.request({"command": "MyClientFunc", "file": "user_file"})
+            self.context.request("MyClientFunc", file="user_file")
     
         def check_split(self) -> list[str] | None:
             output = self.context.get_response("MyClientFunc")

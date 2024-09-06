@@ -19,7 +19,7 @@ File Example
     
         context.update_file("test", "test contents")
         sleep(1)
-        context.request({"command": "test", "file": "test"})
+        context.request("test", file="test")
     
         sleep(1)
     

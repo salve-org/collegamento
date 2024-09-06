@@ -11,17 +11,15 @@ def test_normal_client():
     Client({"foo": foo})
     x = Client({"foo": (foo, True), "foo2": foo})
 
-    x.request({"command": "foo"})
-    x.request({"command": "foo"})
-    x.request({"command": "foo2"})
-    x.request(
-        {"command": "foo2"}
-    )  # If you see six "Foo called"'s, thats bad news bears
+    x.request("foo")
+    x.request("foo")
+    x.request("foo2")
+    x.request("foo2")  # If you see six "Foo called"'s, thats bad news bears
     x.add_command("foo3", foo)
-    x.request({"command": "foo3"})
+    x.request("foo3")
     x.add_command("foo4", foo, True)
-    x.request({"command": "foo4"})
-    x.request({"command": "foo4"})
+    x.request("foo4")
+    x.request("foo4")
 
     sleep(1)
 
@@ -44,7 +42,7 @@ def test_normal_client():
     assert x.all_ids == []
 
     Client()
-    Client({"foo": foo}).request({"command": "foo"})
+    Client({"foo": foo}).request("foo")
     Client().kill_IPC()
     Client().create_server()
 

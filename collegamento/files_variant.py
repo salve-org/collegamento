@@ -52,18 +52,15 @@ class FileClient(Client):
         for file, data in files_copy.items():
             self.update_file(file, data)
 
-    def request(
-        self,
-        request_details: dict,
-    ) -> None:
-        if "file" in request_details:
-            file = request_details["file"]
+    def request(self, command: str, **kwargs) -> None:
+        if "file" in kwargs:
+            file = kwargs["file"]
             if file not in self.files:
                 raise CollegamentoError(
                     f"File {file} not in files! Files are {self.files.keys()}"
                 )
 
-        super().request(request_details)
+        super().request(command, **kwargs)
 
     def update_file(self, file: str, current_state: str) -> None:
         """Updates files in the system - external API"""
@@ -77,7 +74,7 @@ class FileClient(Client):
             "contents": self.files[file],
         }
 
-        super().request(file_notification)
+        super().request(**file_notification)
 
     def remove_file(self, file: str) -> None:
         """Removes a file from the main_server - external API"""
@@ -92,7 +89,7 @@ class FileClient(Client):
             "remove": True,
         }
 
-        super().request(file_notification)
+        super().request(**file_notification)
 
 
 class FileServer(Server):
