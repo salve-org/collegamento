@@ -1,14 +1,14 @@
-from logging import Logger
 from typing import NotRequired
 
-from .simple_client_server import (
+from .client_server import (
+    COMMANDS_MAPPING,
     USER_FUNCTION,
+    Client,
     CollegamentoError,
     Request,
     RequestQueueType,
     ResponseQueueType,
-    SimpleClient,
-    SimpleServer,
+    Server,
 )
 
 
@@ -21,27 +21,24 @@ def update_files(server: "FileServer", request: Request) -> None:
     file: str = request["file"]  # type: ignore
 
     if request["remove"]:  # type: ignore
-        server.logger.info(f"File {file} was requested for removal")
         server.files.pop(file)
-        server.logger.info(f"File {file} has been removed")
     else:
         contents: str = request["contents"]  # type: ignore
         server.files[file] = contents
-        server.logger.info(f"File {file} has been updated with new contents")
 
 
-class FileClient(SimpleClient):
+class FileClient(Client):
     """File handling variant of SImpleClient. Extra methods:
     - FileClient.update_file()
     - FileClient.remove_file()
     """
 
     def __init__(
-        self, commands: dict[str, USER_FUNCTION], id_max: int = 15_000
+        self, commands: COMMANDS_MAPPING, id_max: int = 15_000
     ) -> None:
         self.files: dict[str, str] = {}
 
-        commands["FileNotification"] = update_files
+        commands["FileNotification"] = (update_files, True)
 
         super().__init__(commands, id_max, FileServer)
 
@@ -50,12 +47,10 @@ class FileClient(SimpleClient):
 
         super().create_server()
 
-        self.logger.info("Copying files to server")
         files_copy = self.files.copy()
         self.files = {}
         for file, data in files_copy.items():
             self.update_file(file, data)
-        self.logger.debug("Finished copying files to server")
 
     def request(
         self,
@@ -64,10 +59,7 @@ class FileClient(SimpleClient):
         if "file" in request_details:
             file = request_details["file"]
             if file not in self.files:
-                self.logger.exception(
-                    f"File {file} not in files! Files are {self.files.keys()}"
-                )
-                raise Exception(
+                raise CollegamentoError(
                     f"File {file} not in files! Files are {self.files.keys()}"
                 )
 
@@ -76,10 +68,8 @@ class FileClient(SimpleClient):
     def update_file(self, file: str, current_state: str) -> None:
         """Updates files in the system - external API"""
 
-        self.logger.info(f"Updating file: {file}")
         self.files[file] = current_state
 
-        self.logger.debug("Creating notification dict")
         file_notification: dict = {
             "command": "FileNotification",
             "file": file,
@@ -87,46 +77,39 @@ class FileClient(SimpleClient):
             "contents": self.files[file],
         }
 
-        self.logger.debug("Notifying server of file update")
         super().request(file_notification)
 
     def remove_file(self, file: str) -> None:
         """Removes a file from the main_server - external API"""
         if file not in list(self.files.keys()):
-            self.logger.exception(
-                f"Cannot remove file {file} as file is not in file database!"
-            )
             raise CollegamentoError(
                 f"Cannot remove file {file} as file is not in file database!"
             )
 
-        self.logger.info("Notifying server of file deletion")
         file_notification: dict = {
             "command": "FileNotification",
             "file": file,
             "remove": True,
         }
-        self.logger.debug("Notifying server of file removal")
+
         super().request(file_notification)
 
 
-class FileServer(SimpleServer):
+class FileServer(Server):
     """File handling variant of SimpleServer"""
 
     def __init__(
         self,
-        commands: dict[str, USER_FUNCTION],
-        response_queue: ResponseQueueType,
+        commands: dict[str, tuple[USER_FUNCTION, bool]],
         requests_queue: RequestQueueType,
-        logger: Logger,
+        response_queue: ResponseQueueType,
     ) -> None:
         self.files: dict[str, str] = {}
 
         super().__init__(
             commands,
-            response_queue,
             requests_queue,
-            logger,
+            response_queue,
             ["FileNotification"],
         )
 

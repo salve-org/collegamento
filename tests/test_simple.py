@@ -1,42 +1,51 @@
 from time import sleep
 
-from collegamento import (
-    USER_FUNCTION,
-    Request,
-    Response,
-    SimpleClient,
-    SimpleServer,
-)
+from collegamento import Client, Response
 
 
-def foo(server: SimpleServer, bar: Request) -> bool:
-    if bar["command"] == "test":
-        return True
-    return False
+def foo(server, request):
+    print("Foo called", request["id"])
 
 
-def test_Client_Server():
-    commands: dict[str, USER_FUNCTION] = {"test": foo}
-    context = SimpleClient(commands)
+def test_normal_client():
+    Client({"foo": foo})
+    x = Client({"foo": (foo, True), "foo2": foo})
 
-    context.request({"command": "test"})
-    context.add_command("test1", foo)
-
-    sleep(1)
-
-    output: Response | None = context.get_response("test")
-
-    assert output is not None  # noqa: E711
-    assert output["result"] == True  # noqa: E712 # type: ignore
-
-    context.request({"command": "test1"})
+    x.request({"command": "foo"})
+    x.request({"command": "foo"})
+    x.request({"command": "foo2"})
+    x.request(
+        {"command": "foo2"}
+    )  # If you see six "Foo called"'s, thats bad news bears
+    x.add_command("foo3", foo)
+    x.request({"command": "foo3"})
+    x.add_command("foo4", foo, True)
+    x.request({"command": "foo4"})
+    x.request({"command": "foo4"})
 
     sleep(1)
 
-    output: Response | None = context.get_response("test1")
-    assert output is not None  # noqa: E711
-    assert output["result"] == False  # noqa: E712 # type: ignore
+    x.check_responses()  # Not necessary, we're just checking that doing
+    # this first doesn't break get_response
 
-    assert context.all_ids == []
+    foo_r: list[Response] = x.get_response("foo")  # type: ignore
+    foo_two_r: Response = x.get_response("foo2")  # type: ignore
+    foo_three_r: Response = x.get_response("foo3")  # type: ignore
+    foo_four_r: list[Response] = x.get_response("foo4")  # type: ignore
 
-    context.kill_IPC()
+    assert len(foo_r) == 2
+    assert foo_two_r
+    assert foo_three_r
+    assert len(foo_four_r) == 2
+
+    x.check_responses()
+    x.create_server()
+
+    assert x.all_ids == []
+
+    Client()
+    Client({"foo": foo}).request({"command": "foo"})
+    Client().kill_IPC()
+    Client().create_server()
+
+    sleep(1)
