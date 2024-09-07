@@ -17,6 +17,8 @@ def test_file_variants():
 
     context.update_file("test", "test contents")
     context.update_file("test2", "test contents2")
+    sleep(1)
+    context.create_server()
     context.request("test")
 
     sleep(1)

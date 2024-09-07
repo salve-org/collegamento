@@ -14,7 +14,7 @@ The ``CollegamentoError`` class is a simple error class for ``Collegamento``.
 ``Request``
 ***********
 
-The ``Request`` class is a TypedDict meant to provide a framework for items given to functions used by the IPC. It *will* almsot always contain extra items regardless of the fact that that's not supposed to happen (just add ``# type: ignore`` to the end of the line to shut up the langserver). The data provided will not be typed checked to make sure its proper. The responsibility of data rests on the user.
+The ``Request`` class is a TypedDict meant to provide a framework for items given to functions used by the IPC. It *will* almsot always contain extra items regardless of the fact that they aren't outlined in the ``TypedDict`` (just add ``# type: ignore`` to the end of the line to shut up the langserver). The data provided will not be typed checked to make sure its proper. The responsibility of data rests on the user.
 
 .. _Response Overview:
 
@@ -71,3 +71,17 @@ This class also has some changed functionality. When you make a ``.request()`` a
 **************
 
 The ``FileServer`` is a backend piece of code made visible for commands that can be given to a ``FileClient``. See my explanation on :ref:`Server Overview`
+
+.. _RequestQueueType Overview:
+
+``RequestQueueType``
+*********************
+
+A subtype hint for `multiprocessing.Queue[Request]` that is meant to be used for the ``Request`` class that defaults to `multiprocessing.Queue` if the python version is less than 3.12.
+
+.. _ResponseQueueType Overview:
+
+``ResponseQueueType``
+**********************
+
+A subtype hint for `multiprocessing.Queue[Response]` that is meant to be used for the ``Response`` class that defaults to `multiprocessing.Queue` if the python version is less than 3.12.

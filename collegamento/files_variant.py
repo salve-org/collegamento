@@ -22,9 +22,10 @@ def update_files(server: "FileServer", request: Request) -> None:
 
     if request["remove"]:  # type: ignore
         server.files.pop(file)
-    else:
-        contents: str = request["contents"]  # type: ignore
-        server.files[file] = contents
+        return
+
+    contents: str = request["contents"]  # type: ignore
+    server.files[file] = contents
 
 
 class FileClient(Client):
@@ -47,18 +48,15 @@ class FileClient(Client):
 
         super().create_server()
 
-        files_copy = self.files.copy()
-        self.files = {}
-        for file, data in files_copy.items():
+        for file, data in self.files.items():
             self.update_file(file, data)
 
     def request(self, command: str, **kwargs) -> None:
-        if "file" in kwargs:
-            file = kwargs["file"]
-            if file not in self.files:
-                raise CollegamentoError(
-                    f"File {file} not in files! Files are {self.files.keys()}"
-                )
+        file: str | None = kwargs.get("file")
+        if file and file not in self.files:
+            raise CollegamentoError(
+                f"File {file} not in files! Files are {self.files.keys()}"
+            )
 
         super().request(command, **kwargs)
 
@@ -67,14 +65,12 @@ class FileClient(Client):
 
         self.files[file] = current_state
 
-        file_notification: dict = {
-            "command": "FileNotification",
-            "file": file,
-            "remove": False,
-            "contents": self.files[file],
-        }
-
-        super().request(**file_notification)
+        super().request(
+            "FileNotification",
+            file=file,
+            remove=False,
+            contents=self.files[file],
+        )
 
     def remove_file(self, file: str) -> None:
         """Removes a file from the main_server - external API"""
@@ -83,13 +79,7 @@ class FileClient(Client):
                 f"Cannot remove file {file} as file is not in file database!"
             )
 
-        file_notification: dict = {
-            "command": "FileNotification",
-            "file": file,
-            "remove": True,
-        }
-
-        super().request(**file_notification)
+        super().request("FileNotification", file=file, remove=True)
 
 
 class FileServer(Server):
@@ -112,7 +102,6 @@ class FileServer(Server):
 
     def handle_request(self, request: Request) -> None:
         if "file" in request and request["command"] != "FileNotification":
-            file = request["file"]
-            request["file"] = self.files[file]
+            request["file"] = self.files[request["file"]]
 
         super().handle_request(request)

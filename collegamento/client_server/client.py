@@ -1,13 +1,16 @@
-# TODO: make sure everything is type hinted while removing redundancy
 """Defines the Client and Server class which provides a convenient and easy to use IPC interface.
 
 >>> def test(*args):
 ...     return
 >>> c = Client({"test": (test, True)})
 >>> c.request({"command": "test"})
+>>> c.request({"command": "test"})
 >>> from time import sleep
 >>> sleep(1)
->>> assert c.get_response("test") is not None
+>>> res = c.get_response("test")
+>>> res
+[{...}, {...}]
+>>> assert len(res) == 2
 >>> c.kill_IPC()
 """
 
@@ -20,7 +23,9 @@ from .utils import (
     USER_FUNCTION,
     CollegamentoError,
     Request,
+    RequestQueueType,
     Response,
+    ResponseQueueType,
 )
 
 
@@ -47,13 +52,13 @@ class Client:
         The most common input is commands and id_max. server_type is only really useful for wrappers."""
 
         self.all_ids: list[int] = []
-        self.id_max = id_max
+        self.id_max: int = id_max
 
         # int corresponds to str and str to int = int -> str & str -> int
         self.current_ids: dict[str | int, int | str] = {}
 
         self.newest_responses: dict[str, list[Response]] = {}
-        self.server_type = server_type
+        self.server_type: type = server_type
 
         self.commands: dict[str, tuple[USER_FUNCTION, bool]] = {}
 
@@ -67,8 +72,8 @@ class Client:
             self.commands[command] = func
             self.newest_responses[command] = []
 
-        self.request_queue: Queue
-        self.response_queue: Queue
+        self.request_queue: RequestQueueType
+        self.response_queue: ResponseQueueType
         self.main_process: Process
         self.create_server()
 
@@ -80,6 +85,9 @@ class Client:
             # If the old Process didn't finish instatiation we need to terminate the Process
             # so it doesn't try to access queues that no longer exist
             self.main_process.terminate()
+
+            self.check_responses()
+            self.all_ids = []  # The remaining ones will never have been finished
 
         self.request_queue = Queue()
         self.response_queue = Queue()
@@ -99,7 +107,7 @@ class Client:
 
         # In cases where there are many many requests being sent it may be faster to choose a
         # random id than to iterate through the list of id's and find an unclaimed one
-        id = randint(1, self.id_max)  # 0 is reserved for the empty case
+        id: int = randint(1, self.id_max)  # 0 is reserved for the empty case
         while id in self.all_ids:
             id = randint(1, self.id_max)
         self.all_ids.append(id)
@@ -136,13 +144,13 @@ class Client:
 
     def parse_response(self, res: Response) -> None:
         """Parses main process output and discards useless responses - internal API"""
-        id = res["id"]
+        id: int = res["id"]
         self.all_ids.remove(id)
 
         if "command" not in res:
             return
 
-        command = res["command"]
+        command: str = res["command"]
 
         if command == "add-command":
             return
@@ -177,7 +185,9 @@ class Client:
 
         # If we know that the command doesn't allow multiple requests don't give a list
         if not self.commands[command][1]:
-            return response[0]
+            return response[
+                0
+            ]  # Will only ever be one but we know its at index 0
 
         return response
 
@@ -198,8 +208,11 @@ class Client:
             "type": "request",
             "command": "add-command",
         }
-        command_tuple = (command, multiple_requests)
-        final_request.update({"name": name, "function": command_tuple})  # type: ignore
+        command_tuple: tuple[USER_FUNCTION, bool] = (
+            command,
+            multiple_requests,
+        )
+        final_request.update(**{"name": name, "function": command_tuple})
 
         self.request_queue.put(final_request)
         self.commands[name] = command_tuple

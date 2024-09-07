@@ -69,7 +69,7 @@ class Server:
             self.simple_id_response(id)
             return
 
-        command: str = message["command"]  # type: ignore
+        command: str = message["command"]
 
         if command == "add-command":
             request_name: str = message["name"]  # type: ignore
@@ -91,7 +91,7 @@ class Server:
         self.newest_requests[command].append(message)
 
     def cancel_old_ids(self) -> None:
-        accepted_ids = [
+        accepted_ids: list[int] = [
             request["id"]
             for request_list in list(self.newest_requests.values())
             for request in request_list
