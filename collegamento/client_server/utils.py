@@ -35,12 +35,12 @@ COMMANDS_MAPPING = dict[
 ]  # if bool is true the command allows multiple requests
 
 
-ResponseQueueType = GenericQueueClass
-RequestQueueType = GenericQueueClass
-
-# "If this is CPython < 3.12. We are now in the No Man's Land
-# of Typing. In this case, avoid subscripting "GenericQueue". Ugh."
-# - @leycec, maintainer of the amazing @beartype
 if TYPE_CHECKING:
     ResponseQueueType = GenericQueueClass[Response]
     RequestQueueType = GenericQueueClass[Request]
+# "Else this is CPython < 3.12. We are now in the No Man's Land
+# of Typing. In this case, avoid subscripting "GenericQueue". Ugh."
+# - @leycec, maintainer of the amazing @beartype
+else:
+    ResponseQueueType = GenericQueueClass
+    RequestQueueType = GenericQueueClass

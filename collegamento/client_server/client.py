@@ -3,8 +3,8 @@
 >>> def test(*args):
 ...     return
 >>> c = Client({"test": (test, True)})
->>> c.request({"command": "test"})
->>> c.request({"command": "test"})
+>>> c.request("test")
+>>> c.request("test")
 >>> from time import sleep
 >>> sleep(1)
 >>> res = c.get_response("test")
@@ -36,7 +36,7 @@ class Client:
 
     The public API includes the following methods:
     - Client.add_command(name: str, command: USER_FUNCTION, multiple_requests: bool = False)
-    - Client.request(request_details: dict) -> None | int
+    - Client.request(command: str, **kwargs) -> None | int
     - Client.get_response(command: str) -> Response | list[Response] | None
     - Client.kill_IPC()
     """
@@ -107,7 +107,8 @@ class Client:
 
         # In cases where there are many many requests being sent it may be faster to choose a
         # random id than to iterate through the list of id's and find an unclaimed one
-        id: int = randint(1, self.id_max)  # 0 is reserved for the empty case
+        # NOTE: 0 is reserved for when there's no curent id's (self.current_ids)
+        id: int = randint(1, self.id_max)
         while id in self.all_ids:
             id = randint(1, self.id_max)
         self.all_ids.append(id)
@@ -185,9 +186,7 @@ class Client:
 
         # If we know that the command doesn't allow multiple requests don't give a list
         if not self.commands[command][1]:
-            return response[
-                0
-            ]  # Will only ever be one but we know its at index 0
+            return response[0]  # Will only ever be one
 
         return response
 
