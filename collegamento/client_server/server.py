@@ -143,7 +143,12 @@ class Server:
             for request in request_list
         ]
 
-        requests_list = sorted(requests_list, key=lambda request: command_sort_func(request, self.priority_commands))
+        requests_list = sorted(
+            requests_list,
+            key=lambda request: command_sort_func(
+                request, self.priority_commands
+            ),
+        )
 
         for request in requests_list:
             if request is None:
