@@ -4,32 +4,31 @@ Simple Example
 
 .. code-block:: python
 
-    from collegamento import (
-        USER_FUNCTION,
-        Request,
-        Response,
-        SimpleClient,
-        SimpleServer,
-    )
+    from time import sleep
+    
+    from collegamento import Client, Request, Response, Server
     
     
-    def foo(server: "SimpleServer", bar: Request) -> bool:
+    def foo(server: "Server", bar: Request) -> bool:
         if bar["command"] == "test":
             return True
         return False
     
     
     def main():
-        commands: dict[str, USER_FUNCTION] = {"test": foo}
-        context = SimpleClient(commands)
+        # As of collegamento v0.3.0 you can allow multiple requests for the same command
+        # like so: {"test": (foo, True)} (using (foo, False)) is the default (only newest request)
+        context = Client({"test": foo})
     
-        context.request({"command": "test"})
+        context.request("test")
     
-        output: Response | None = context.get_response("test")
-        if output is not None and output["result"]:  # type: ignore
+        sleep(1)
+    
+        output: Response = context.get_response("test")  # type: ignore
+        if output and output[0]["result"]:  # type: ignore
             print("Yippee! It worked!")
         else:
-            print("Aww, maybe your compute is just a little slow?")
+            print("Aww, maybe your computer is just a little slow?")
     
         context.kill_IPC()
     

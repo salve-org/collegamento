@@ -6,13 +6,7 @@ File Example
 
     from time import sleep
     
-    from collegamento import (
-        USER_FUNCTION,
-        FileClient,
-        FileServer,
-        Request,
-        Response,
-    )
+    from collegamento import FileClient, FileServer, Request, Response
     
     
     def split_str(server: "FileServer", arg: Request) -> list[str]:
@@ -21,16 +15,15 @@ File Example
     
     
     def main():
-        commands: dict[str, USER_FUNCTION] = {"test": split_str}
-        context = FileClient(commands)
+        context = FileClient({"test": split_str})
     
         context.update_file("test", "test contents")
         sleep(1)
-        context.request({"command": "test", "file": "test"})
+        context.request("test", file="test")
     
         sleep(1)
     
-        output: Response | None = context.get_response("test")
+        output: Response = context.get_response("test")  # type: ignore
         print(output)
     
         context.kill_IPC()

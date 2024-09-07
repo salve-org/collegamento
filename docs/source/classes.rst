@@ -14,32 +14,44 @@ The ``CollegamentoError`` class is a simple error class for ``Collegamento``.
 ``Request``
 ***********
 
-The ``Request`` class is a TypedDict meant to provide a framework for items given to functions used by the IPC. It *will* almsot always contain extra items regardless of the fact that that's not supposed to happen (just add ``# type: ignore`` to the end of the line to shut up the langserver). The data provided will not be typed checked to make sure its proper. The responsibility of data rests on the user.
+The ``Request`` class is a TypedDict meant to provide a framework for items given to functions used by the IPC. It *will* almsot always contain extra items regardless of the fact that they aren't outlined in the ``TypedDict`` (just add ``# type: ignore`` to the end of the line to shut up the langserver). The data provided will not be typed checked to make sure its proper. The responsibility of data rests on the user.
 
 .. _Response Overview:
 
 ``Response``
 ************
 
-The ``Response`` class is what is returned by the "ref:`SimpleClient Overview` or one of it's variants to the user. The useful data is found at ``some_response["result"]``.
+The ``Response`` class is what is returned by the "ref:`Client Overview` or one of it's variants to the user. The useful data is found at ``some_response["result"]``.
 
-.. _SimpleClient Overview:
+.. _Client Overview:
 
-``SimpleClient``
+``Client``
 ****************
 
-The ``SimpleClient`` class can do:
+The ``Client`` class can do:
 
-- ``SimpleClient.request(request_details: dict)`` (all details in request_details are specific to the command in the request_details)
-- ``SimpleClient.add_command(name: str, command: USER_FUNCTION)`` (adds the function with the name provided that takes input of :ref:`Request Overview` and returns anything``
-- ``SimpleClient.kill_IPC()`` (kills the IPC server)
+- ``Client.request(command: str, **kwargs)``
+- ``Client.add_command(name: str, command: USER_FUNCTION, multiple_requests: bool = False)`` (adds the function with the name provided that takes input of :ref:`Request Overview` and returns anything)
+- ``Client.get_response(command: str) -> Response | list[Response] | None`` (returns a list of ``Response``'s if the command allows multiple requests otherwise a single ``Response`` if there is were any responses ohterwise ``None``)
+- ``Client.kill_IPC()`` (kills the IPC server)
 
-.. _SimpleServer Overview:
+When using the ``Client`` class you give the commands as a dict. Below are the ways it can be specified:
+ - ``{"foo": foo}`` (this means the command foo can only take the newest request given
+ - ``{"foo": (foo, False)}`` (this means the command foo can only take the newest request given
+ - ``{"foo": (foo, True)}`` (this means the command foo can take all requests given (new or old)
 
-``SimpleServer``
+By default ``Collegamento`` assumes you only want the newest request but chooses to still give the option to make multiple requests. For ``.get_response()`` the output changes based on how this was specified by giving ``None`` if there was no response, ``Response`` if the command only allows the newest request, and ``list[Response]`` if it allows multiple regardless of how many times you made a request for it.
+
+Note that because of the way that the commands are handed to the ``Server`` and run, they can actually modify its attributes and theoretically even the functions the ``Server`` runs. This high flexibility also requires the user to ensure that they properly manage any attributes they mess with.
+
+When it comes to requesting the server to run a command, you give the command as the first argument and all subsequent args for the function the ``Server`` calls are given as kwargs that are passed on.
+
+.. _Server Overview:
+
+``Server``
 ****************
 
-The SimpleServer is a backend piece of code made visible for commands that can be given to a ``SimpleClient``. If you want to know more about it, check out the source code ;).
+The ``Server`` is a backend piece of code made visible for commands that can be given to a ``Client``. If you want to know more about it, check out the source code ;). The reason it is mentioned is because it is given as an argument to :ref:`USER_FUNCTION Overview`'s and we choose to let type declarations exist.
 
 .. _FileClient Overview:
 
@@ -51,11 +63,25 @@ The SimpleServer is a backend piece of code made visible for commands that can b
 - ``FileClient.update_file(file: str, current_state: str)`` (adds or updates the file with the new contents and notifies server of changes)
 - ``FileClient.remove_file(file: str)`` (removes the file specified from the system and notifies the server to fo the same)
 
-This class also has some changed functionality. When you make a ``.request()`` and add a file to the request, it chnages the request's name to its contents for the function to use.
+This class also has some changed functionality. When you make a ``.request()`` and add a file to the request, it changes the request's file name to its contents for the function to use. This isn't technically necessary as the function called can access the files in the Server and modify them as it pleases since it has full access to all the Server's resources.
 
 .. _FileServer Overview:
 
 ``FileServer``
 **************
 
-The ``FileServer`` is a backend piece of code made visible for commands that can be given to a ``FileClient``. If you want to know more about it, check out the source code ;).
+The ``FileServer`` is a backend piece of code made visible for commands that can be given to a ``FileClient``. See my explanation on :ref:`Server Overview`
+
+.. _RequestQueueType Overview:
+
+``RequestQueueType``
+*********************
+
+A subtype hint for `multiprocessing.Queue[Request]` that is meant to be used for the ``Request`` class that defaults to `multiprocessing.Queue` if the python version is less than 3.12.
+
+.. _ResponseQueueType Overview:
+
+``ResponseQueueType``
+**********************
+
+A subtype hint for `multiprocessing.Queue[Response]` that is meant to be used for the ``Response`` class that defaults to `multiprocessing.Queue` if the python version is less than 3.12.
