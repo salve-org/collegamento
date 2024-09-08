@@ -1,4 +1,4 @@
-<h1 align="center">collegamento v0.3.0/h1>
+<h1 align="center">collegamento v0.3.0</h1>
 
 A tool that makes it much easier to make offload work when asyncio isn't an option.
 
