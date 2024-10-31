@@ -46,4 +46,4 @@ Class Example
     if __name__ == "__main__":
         main()
 
-See the file example file `here <https://github.com/salve-org/albero/blob/master/examples/class_example.py>`_.
+See the file example file `here <https://github.com/salve-org/collegamento/blob/master/examples/class_example.py>`_.
